@@ -57,8 +57,8 @@
 
 ## Nota de numeración
 
-La etapa de diseño de arquitectura (desarrollada inicialmente como "Etapa 1" en la bitácora de conversación) corresponde al archivo `etapa-02-diseno-arquitectura.md`. Su contenido ya fue desarrollado y está **pendiente de persistir** en ese archivo; por eso figura como *En progreso*.
+El diseño de arquitectura se encuentra desarrollado en `etapa-02-diseno-arquitectura.md` (estado *En progreso*: pendiente de validación contra el enunciado y de confirmar la cola AMQP asignada).
 
 ## Siguiente etapa recomendada
 
-**Etapa 1** solo tiene pendientes menores: completar la tabla de versiones de la bitácora (git, node, npm, docker), confirmar el nombre de la cola AMQP asignada y hacer el primer commit + push. Con eso se marca **Completado** y se avanza a la **Etapa 2** (persistir el diseño de arquitectura en `etapa-02-diseno-arquitectura.md`).
+**Etapa 2** — validar el diseño contra el enunciado y completar la checklist. Con eso se avanza a la **Etapa 3** (`etapa-03-poc-rabbitmq.md`), cuyo prerrequisito es el nombre de la cola AMQP confirmado.

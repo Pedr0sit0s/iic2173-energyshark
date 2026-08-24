@@ -26,6 +26,7 @@
 | 2 | 2026-08-23 | Definición de la estructura de documentación (`etapas/`) |
 | 3 | 2026-08-23 | Etapa 1 — Preparación del entorno local (ejecución) |
 | 4 | 2026-08-23 | Cierre documental de la Etapa 1 |
+| 5 | 2026-08-23 | Etapa 2 — Diseño de arquitectura (desarrollo del documento) |
 
 ---
 
@@ -137,3 +138,26 @@ git branch -M main
 - **Resultado de pruebas:** Documentos generados y revisados; estructura completa.
 - **Registro de IA:** `ai_docs/prompts/2026-08-23-papeleo-final-etapa-01.md`
 - **Estado:** Completado
+
+---
+
+## Entrada 5 — Etapa 2 — Diseño de arquitectura (desarrollo del documento)
+
+- **Fecha:** 2026-08-23
+- **Objetivo:** Persistir el diseño de arquitectura completo en `etapas/etapa-02-diseno-arquitectura.md` como documento canónico del proyecto.
+- **Decisiones técnicas:**
+  - Monorepo (`apps/connector`, `apps/master`, `infra/nginx`).
+  - `connector` como app NestJS standalone (sin servidor HTTP).
+  - Cliente RabbitMQ: **amqplib** (control total de reconexión + soporte TLS).
+  - Conexión al broker con **AMQPS/TLS** (`amqps://observer.45@broker.iic2173.org:5671/energy`), requerida por el curso.
+  - ORM: TypeORM. Modelo híbrido: columnas (`id`, `idpk`, `type`, `receivedAt`, `validUntil`, `createdAt`) + `packageBody` JSONB.
+  - Paginación con `LIMIT/OFFSET` (`page`/`limit`, default 25).
+  - `receivedAt` asignado por `master` (no por `connector`).
+  - Región AWS `us-east-1`; PostgreSQL de desarrollo en contenedor Docker.
+- **Problemas encontrados y solución:**
+  - El broker del curso usa TLS en puerto 5671: se incorporó la decisión técnica #10 y se ajustó la URL de conexión a `amqps://`.
+  - La cola AMQP asignada sigue pendiente de confirmación: quedó marcada como prerrequisito de la Etapa 3.
+- **Comandos importantes:** `git add etapas/etapa-02-diseno-arquitectura.md && git commit -m "docs: etapa 2 diseno de arquitectura"`
+- **Resultado de pruebas:** Documento generado con teoría, diagramas, modelo de datos, API, contrato connector→master y configuración por entorno. Pendiente: validación contra el enunciado oficial.
+- **Registro de IA:** `ai_docs/prompts/2026-08-23-etapa-02-diseno-arquitectura.md`
+- **Estado:** En progreso (pendiente: validar contra enunciado, confirmar cola AMQP, checklist de la sección 13)

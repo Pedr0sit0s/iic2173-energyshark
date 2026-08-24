@@ -32,3 +32,4 @@ ai_docs/
 | 2026-08-23 | `prompts/2026-08-23-plan-maestro.md` | Plan Maestro y estructura de documentación |
 | 2026-08-23 | `prompts/2026-08-23-etapa-01-preparacion-entorno.md` | Desarrollo de la Etapa 1 |
 | 2026-08-23 | `prompts/2026-08-23-papeleo-final-etapa-01.md` | Cierre documental de la Etapa 1 |
+| 2026-08-23 | `prompts/2026-08-23-etapa-02-diseno-arquitectura.md` | Desarrollo de la Etapa 2 (diseño de arquitectura) |
