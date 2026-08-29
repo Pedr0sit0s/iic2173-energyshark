@@ -1,0 +1,29 @@
+{
+  "name": "poc",
+  "version": "1.0.0",
+  "description": "PoC Etapa 3: conexion a RabbitMQ (AMQPS/TLS), consumo y reconexion automatica",
+  "private": true,
+  "main": "amqp-poc.ts",
+  "scripts": {
+    "start": "tsx --env-file=.env amqp-poc.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "amqp",
+    "rabbitmq",
+    "poc"
+  ],
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "amqplib": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
