@@ -1,7 +1,7 @@
 # Etapa 2 — Fundamentos teóricos y diseño de arquitectura
 
 > **Archivo:** `etapas/etapa-02-diseno-arquitectura.md`
-> **Estado:** En progreso
+> **Estado:** Completado
 > **Checkpoint objetivo:** CP-L2 — Arquitectura diseñada y versionada
 
 ---
@@ -317,20 +317,20 @@ git push
 
 ## 13. Checklist de finalización
 
-- [ ] Teoría de la sección 3 leída y comprendida.
-- [ ] Componentes validados contra el enunciado (sección 4).
-- [ ] Cola AMQP asignada confirmada y registrada en la bitácora.
-- [ ] Diagramas 6.1 y 6.2 aprobados y consistentes.
-- [ ] Modelo de datos aprobado (tabla + índices, columnas vs JSONB justificado).
-- [ ] `receivedAt` definido como `timestamptz` UTC asignado por `master`.
-- [ ] API diseñada y mapeada a RF1–RF4 (endpoints, paginación, filtros, errores).
-- [ ] Contrato connector→master definido (ack solo tras 2xx, reintentos).
-- [ ] Inventario de variables de entorno dev/prod aprobado.
-- [ ] Estrategia de secretos verificada (sin credenciales versionadas).
-- [ ] Documento contrastado con el enunciado oficial (PDF).
-- [ ] Matriz de trazabilidad actualizada (diseño de RF4 y RNF-2).
-- [ ] Bitácora y `ai_docs/prompts/` actualizados.
-- [ ] Commit realizado y pusheado.
+- [x] Teoría de la sección 3 leída y comprendida.
+- [x] Componentes validados contra el enunciado (sección 4).
+- [ ] Cola AMQP asignada confirmada y registrada en la bitácora. *(traspasada a la Etapa 3 como Paso 0 — única excepción del cierre)*
+- [x] Diagramas 6.1 y 6.2 aprobados y consistentes.
+- [x] Modelo de datos aprobado (tabla + índices, columnas vs JSONB justificado).
+- [x] `receivedAt` definido como `timestamptz` UTC asignado por `master`.
+- [x] API diseñada y mapeada a RF1–RF4 (endpoints, paginación, filtros, errores).
+- [x] Contrato connector→master definido (ack solo tras 2xx, reintentos).
+- [x] Inventario de variables de entorno dev/prod aprobado.
+- [x] Estrategia de secretos verificada (sin credenciales versionadas).
+- [x] Documento contrastado con el enunciado oficial (PDF).
+- [x] Matriz de trazabilidad actualizada (diseño de RF4 y RNF-2).
+- [x] Bitácora y `ai_docs/prompts/` actualizados.
+- [x] Commit realizado y pusheado.
 
 ---
 

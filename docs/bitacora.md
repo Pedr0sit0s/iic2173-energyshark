@@ -27,6 +27,9 @@
 | 3 | 2026-08-23 | Etapa 1 — Preparación del entorno local (ejecución) |
 | 4 | 2026-08-23 | Cierre documental de la Etapa 1 |
 | 5 | 2026-08-23 | Etapa 2 — Diseño de arquitectura (desarrollo del documento) |
+| 6 | 2026-08-26 | Cierre de la Etapa 2 |
+| 7 | 2026-08-26 | Etapa 3 — PoC RabbitMQ (planificación e inicio) |
+| 8 | 2026-08-29 | Etapa 3 — PoC RabbitMQ (ejecución, refactor y cierre) |
 
 ---
 
@@ -101,7 +104,7 @@
 | Virtual host | `energy` |
 | Usuario | `observer.45` |
 | Exchange | `energy.x` |
-| Cola asignada al observer | **Pendiente de confirmar** (requerida para la Etapa 3) |
+| Cola asignada al observer | `observer.45.q` (confirmada en la Entrada 8) |
 | Contraseña | Solo en `.env` local — nunca documentada |
 
 URL de conexión prevista: `amqps://observer.45:<password>@broker.iic2173.org:5671/energy`
@@ -161,3 +164,68 @@ git branch -M main
 - **Resultado de pruebas:** Documento generado con teoría, diagramas, modelo de datos, API, contrato connector→master y configuración por entorno. Pendiente: validación contra el enunciado oficial.
 - **Registro de IA:** `ai_docs/prompts/2026-08-23-etapa-02-diseno-arquitectura.md`
 - **Estado:** En progreso (pendiente: validar contra enunciado, confirmar cola AMQP, checklist de la sección 13)
+
+---
+
+## Entrada 6 — Cierre de la Etapa 2
+
+- **Fecha:** 2026-08-26
+- **Objetivo:** Cerrar la Etapa 2 (diseño de arquitectura) al 100% y dejarla como referencia canónica para las Etapas 3–6.
+- **Decisiones técnicas:**
+  - El documento `etapas/etapa-02-diseno-arquitectura.md` queda aprobado como diseño canónico del proyecto (10 decisiones técnicas, modelo de datos híbrido, API, contrato connector→master y configuración por entorno).
+  - Checklist de finalización de la etapa completada (sección 13), con una excepción: la confirmación del nombre de la cola AMQP se traspasa a la Etapa 3 como **Paso 0**.
+- **Problemas encontrados y solución:**
+  - Pérdida del historial de la sesión anterior: el estado del proyecto se reconstruyó íntegramente desde los archivos del repositorio.
+  - La cola AMQP asignada sigue sin confirmar: no bloquea el cierre documental; queda como prerrequisito explícito de la Etapa 3.
+- **Comandos importantes:** ninguno nuevo en esta entrada.
+- **Resultado de pruebas:** Estado de la Etapa 2 actualizado a **Completado** en `etapas/README.md`; matriz de trazabilidad del plan maestro actualizada (RF4 y RNF-2 → En progreso).
+- **Registro de IA:** `ai_docs/prompts/2026-08-26-etapa-03-poc-rabbitmq.md` (el cierre se documenta en la sesión de inicio de la Etapa 3).
+- **Estado:** Completado
+
+---
+
+## Entrada 7 — Etapa 3 — PoC RabbitMQ (planificación e inicio)
+
+- **Fecha:** 2026-08-26
+- **Objetivo:** Iniciar la Etapa 3 según el Plan Maestro: generar el plan detallado `etapas/etapa-03-poc-rabbitmq.md` y dejar lista la hoja de ruta para ejecutar el PoC de conexión a RabbitMQ (checkpoint CP-L3).
+- **Decisiones técnicas:**
+  - PoC ubicado en `apps/connector/poc/` (será la base del `connector` real de la Etapa 5, sin ensuciar la raíz del repo).
+  - Stack mínimo del PoC: TypeScript + `amqplib` + `tsx` (sin NestJS todavía: la app standalone llega en la Etapa 5).
+  - Consumo con ack explícito (`noAck: false`); mensaje malformado → `nack(requeue: false)` + log, para no caer en bucles de reentrega.
+  - Reconexión automática con backoff exponencial; el proceso nunca termina por caída del broker (RNF-3).
+  - Simulación de caída del broker destruyendo el socket subyacente de la conexión AMQP.
+- **Problemas encontrados y solución:**
+  - Cola AMQP pendiente de confirmación: se incorporó como Paso 0 (prerrequisito) del plan; el resto del plan puede avanzarse (script, parsing y simulación de caída).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-03-poc-rabbitmq.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones (objetivo, teoría, decisiones, pasos, verificación, troubleshooting y checklist); aún sin ejecutar las sub-etapas 3.1–3.3.
+- **Registro de IA:** `ai_docs/prompts/2026-08-26-etapa-03-poc-rabbitmq.md`
+- **Estado:** En progreso (pendiente: Paso 0 — confirmar cola AMQP; sub-etapas 3.1–3.3; checkpoint CP-L3)
+
+---
+
+## Entrada 8 — Etapa 3 — PoC RabbitMQ (ejecución, refactor y cierre)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Ejecutar el PoC de conexión a RabbitMQ (sub-etapas 3.1–3.3), confirmar la cola asignada al observer y alcanzar el checkpoint CP-L3.
+- **Decisiones técnicas:**
+  - Cola AMQP asignada confirmada: **`observer.45.q`** (registrada aquí, en `etapas/etapa-03-poc-rabbitmq.md` y en `.env.example`).
+  - Refactor de `apps/connector/poc/amqp-poc.ts`: tipado estricto, logging estructurado con timestamp UTC, backoff exponencial aislado en función pura, clase `AmqpConsumer` con ciclo de vida, modo caos por teclado y apagado limpio (SIGINT/SIGTERM/Ctrl+C).
+  - Se agregó `tsconfig.json` (modo estricto) y el script `npm run typecheck` (`tsc --noEmit`) para validar el tipado.
+- **Problemas encontrados y solución:**
+  - `tsx` no arrancaba en el entorno: esbuild tenía el binario de plataforma incorrecta (arm64 en un Mac x64) porque npm tenía bloqueado el script de instalación. Solución: `npm approve-scripts --all && npm rebuild esbuild`.
+  - El socket TCP para la simulación de caída se destruye vía `connection.connection.stream.destroy()`: es un acceso interno de amqplib, por lo que quedó tipado con un cast explícito y documentado como uso exclusivo del modo caos.
+- **Comandos importantes:**
+  ```bash
+  cd apps/connector/poc
+  npm install amqplib
+  npm install -D tsx typescript @types/node
+  npm run typecheck
+  npm start   # npx tsx --env-file=.env amqp-poc.ts
+  ```
+- **Resultado de pruebas:**
+  - Conexión AMQPS/TLS establecida correctamente (heartbeat 5 s) contra `broker.iic2173.org:5671`.
+  - Consumo real: 3 eventos `demand-set` recibidos, parseados y validados (ack correcto) en la primera ejecución; estructura confirmada: `idpk` (uuid), `type`, `packageBody.validUntil`.
+  - Prueba de caos: 3 ciclos de destrucción del socket → detección de caída (Heartbeat timeout) → backoff exponencial (~1 s) → reconexión → re-suscripción, sin intervención manual. El proceso nunca terminó por caída del broker (**RNF-3 verificado en local**).
+  - `npm run typecheck` sin errores; el guard de configuración falla de forma controlada si faltan variables de entorno.
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-03-refactor-y-cierre.md`
+- **Estado:** Verificado localmente (checkpoint CP-L3 alcanzado)

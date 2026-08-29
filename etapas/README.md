@@ -40,8 +40,8 @@
 | --- | --- | --- | --- |
 | 0 | `etapa-00-plan-maestro.md` | Roadmap general, trazabilidad y checkpoints | Completado |
 | 1 | `etapa-01-preparacion-entorno.md` | Preparación del entorno local, cuentas y repositorio | En progreso |
-| 2 | `etapa-02-diseno-arquitectura.md` | Fundamentos teóricos y diseño de la arquitectura | En progreso |
-| 3 | `etapa-03-poc-rabbitmq.md` | Prueba de concepto: conexión, consumo y reconexión AMQP | Pendiente |
+| 2 | `etapa-02-diseno-arquitectura.md` | Fundamentos teóricos y diseño de la arquitectura | Completado |
+| 3 | `etapa-03-poc-rabbitmq.md` | Prueba de concepto: conexión, consumo y reconexión AMQP | Verificado localmente |
 | 4 | `etapa-04-master-api-local.md` | Servicio `master`: API REST + persistencia local (RF1–RF4) | Pendiente |
 | 5 | `etapa-05-connector-local.md` | Servicio `connector`: consumo AMQP + reenvío HTTP | Pendiente |
 | 6 | `etapa-06-docker-compose.md` | Dockerización de ambos servicios + Compose + health checks | Pendiente |
@@ -57,8 +57,8 @@
 
 ## Nota de numeración
 
-El diseño de arquitectura se encuentra desarrollado en `etapa-02-diseno-arquitectura.md` (estado *En progreso*: pendiente de validación contra el enunciado y de confirmar la cola AMQP asignada).
+La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. La Etapa 3 (PoC RabbitMQ) está **Verificada localmente** (checkpoint CP-L3): la cola asignada quedó confirmada (`observer.45.q`), el PoC consume eventos reales y se reconecta automáticamente ante caídas del broker.
 
 ## Siguiente etapa recomendada
 
-**Etapa 2** — validar el diseño contra el enunciado y completar la checklist. Con eso se avanza a la **Etapa 3** (`etapa-03-poc-rabbitmq.md`), cuyo prerrequisito es el nombre de la cola AMQP confirmado.
+**Etapa 4** (`etapa-04-master-api-local.md`) — Servicio `master`: scaffold NestJS, PostgreSQL local en Docker, entidad/migraciones de `history`, `POST /events` y endpoints de consulta (RF1–RF4). La estructura real del evento observado en el PoC alimenta el modelo de datos.
