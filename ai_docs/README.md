@@ -48,3 +48,5 @@ ai_docs/
 | 2026-08-30 | `prompts/2026-08-30-etapa-07-cierre-auditoria.md` | Etapa 7: cierre (auditoría, documentación y versionado granular) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-08-primer-despliegue.md` | Inicio de la Etapa 8 (primer despliegue en producción) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-08-cierre-auditoria.md` | Etapa 8: cierre (despliegue en producción, documentación y push) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-09-dominio-dns.md` | Inicio de la Etapa 9 (dominio y DNS) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-09-cierre-auditoria.md` | Etapa 9: cierre (dominio y DNS, documentación y versionado) |
