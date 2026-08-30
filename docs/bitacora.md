@@ -44,6 +44,8 @@
 | 20 | 2026-08-30 | Etapa 9 — Dominio y DNS (ejecución y cierre) |
 | 21 | 2026-08-30 | Etapa 10 — Nginx reverse proxy (planificación e inicio) |
 | 22 | 2026-08-30 | Etapa 10 — Nginx reverse proxy (ejecución y cierre) |
+| 23 | 2026-08-30 | Etapa 11 — HTTPS con Let's Encrypt (planificación e inicio) |
+| 24 | 2026-08-30 | Etapa 11 — HTTPS con Let's Encrypt (ejecución y cierre) |
 
 ---
 
@@ -631,3 +633,60 @@ git branch -M main
 - **Resultado de pruebas:** API accesible por `http://persito.online` (health y history con eventos reales); puerto 3000 no accesible desde el exterior. **CP-P4 alcanzado**; RNF-3/RNF-9 verificados.
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-10-cierre-auditoria.md`
 - **Estado:** Verificado en producción (checkpoint CP-P4 alcanzado)
+
+---
+
+## Entrada 23 — Etapa 11 — HTTPS con Let's Encrypt (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 11 según el Plan Maestro (parte variable elegida: HTTPS): generar el plan detallado `etapas/etapa-11-https-letsencrypt.md` y dejar lista la hoja de ruta para asegurar el dominio con SSL (checkpoint CP-P5, RNF-10).
+- **Decisiones técnicas:**
+  - **Certbot con plugin Nginx** (`python3-certbot-nginx`) y desafío **HTTP-01** en el puerto 80.
+  - Certificado para `persito.online` y `www` (`--redirect` para la redirección 301).
+  - Renovación automática con **`certbot.timer`** (systemd, 2×/día) y verificación con `certbot renew --dry-run`.
+  - Configuración HTTPS **versionada** en `infra/nginx/energyshark.conf` (se actualiza tras la emisión).
+  - Verificación con `curl`, `openssl s_client` y navegador.
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-11-https-letsencrypt.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron el dominio (`persito.online`), Nginx del host (Etapa 10) y el SG con 80/443.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-11-https-letsencrypt.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 11.1–11.5; checkpoint CP-P5)
+
+---
+
+## Entrada 24 — Etapa 11 — HTTPS con Let's Encrypt (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 11.1–11.5 de la Etapa 11 (parte variable elegida: HTTPS): emitir el certificado Let's Encrypt, configurar el server block 443 con redirección HTTP→HTTPS y verificar la renovación automática (checkpoint CP-P5, RNF-10).
+- **Resumen técnico:**
+  - **Certbot + plugin Nginx** instalados (`certbot`, `python3-certbot-nginx`); certificado emitido con `--nginx -d persito.online -d www.persito.online --redirect`.
+  - Server block **443** con `ssl_certificate` de `/etc/letsencrypt/live/persito.online/` y **redirección HTTP → HTTPS** (301).
+  - Renovación automática con **`certbot.timer`** (systemd, 2×/día) y `certbot renew --dry-run` verificado.
+  - Configuración actualizada y **versionada** en `infra/nginx/energyshark.conf`.
+- **Verificación (evidencia real desde el exterior):**
+  ```text
+  $ curl -I https://persito.online/health
+  HTTP/1.1 200 OK
+  Server: nginx/1.24.0 (Ubuntu)
+
+  $ curl -I http://persito.online/health
+  HTTP/1.1 301 Moved Permanently
+  Location: https://persito.online/health
+
+  $ echo | openssl s_client -connect persito.online:443 -servername persito.online | openssl x509 -issuer -dates
+  issuer=CN=YE1, O=Let's Encrypt, C=US
+  subject=CN=persito.online
+  notBefore=Aug 30 20:10:03 2026 GMT
+  notAfter=Nov 28 20:10:02 2026 GMT
+  ```
+- **Problemas encontrados y solución:** Sin bloqueos relevantes; Certbot reconfiguró el server block automáticamente y se reflejó el cambio en el repositorio.
+- **Comandos importantes:**
+  ```bash
+  sudo apt install -y certbot python3-certbot-nginx
+  sudo certbot --nginx -d persito.online -d www.persito.online --redirect
+  sudo certbot renew --dry-run
+  systemctl status certbot.timer
+  ```
+- **Resultado de pruebas:** HTTPS 200 en `/health`, redirección 301 de HTTP, certificado Let's Encrypt válido ~90 días y renovación automática activa. **CP-P5 alcanzado**; RNF-10 y la parte variable (HTTPS) verificados.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-11-cierre-auditoria.md`
+- **Estado:** Verificado en producción (checkpoint CP-P5 alcanzado)
