@@ -17,7 +17,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 8 — Primer despliegue en EC2 (MVP) | Verificado en producción (CP-P2) |
 | 9 — Dominio y DNS | Verificado en producción (CP-P3) |
 | 10 — Nginx reverse proxy | Verificado en producción (CP-P4) |
-| 11–15 | Pendientes |
+| 11 — HTTPS con Let's Encrypt | Verificado en producción (CP-P5) |
+| 12–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -99,7 +100,8 @@ flowchart LR
 | RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | Verificado en producción |
 | RNF-8 | Dominio público y DNS hacia EC2 | Verificado en producción |
 | RNF-9 | Nginx reverse proxy instalado en el host | Verificado en producción |
-| RNF-10, DOC, ENT | HTTPS, entrega | Pendientes |
+| RNF-10 | HTTPS con Let's Encrypt + renovación automática | Verificado en producción |
+| DOC, ENT | Documentación de IA, entrega | Pendientes |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
