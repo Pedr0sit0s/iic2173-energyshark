@@ -36,6 +36,8 @@
 | 12 | 2026-08-29 | Etapa 5 — Servicio `connector` local (ejecución y cierre) |
 | 13 | 2026-08-29 | Etapa 6 — Dockerización y Docker Compose (planificación e inicio) |
 | 14 | 2026-08-29 | Etapa 6 — Dockerización y Docker Compose (ejecución y cierre) |
+| 15 | 2026-08-30 | Etapa 7 — Infraestructura AWS: EC2 + RDS (planificación e inicio) |
+| 16 | 2026-08-30 | Etapa 7 — Infraestructura AWS: EC2 + RDS (ejecución y cierre) |
 
 ---
 
@@ -109,7 +111,7 @@
 | Transporte | AMQPS (TLS) |
 | Virtual host | `energy` |
 | Usuario | `observer.45` |
-| Exchange | `energy.x` |
+| Exchange | `fulfillment.x` |
 | Cola asignada al observer | `observer.45.q` (confirmada en la Entrada 8) |
 | Contraseña | Solo en `.env` local — nunca documentada |
 
@@ -435,3 +437,55 @@ git branch -M main
   - **RNF-5** (Docker + HEALTHCHECK) ✓ · **RNF-6** (Compose master+connector+postgres) ✓ · **CP-L6** alcanzado.
 - **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-06-docker-ejecucion-cierre.md`
 - **Estado:** Verificado localmente (checkpoint CP-L6 alcanzado)
+
+---
+
+## Entrada 15 — Etapa 7 — Infraestructura AWS: EC2 + RDS (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 7 según el Plan Maestro: generar el plan detallado `etapas/etapa-07-aws-ec2-rds.md` y dejar lista la hoja de ruta para crear la infraestructura AWS de producción (checkpoint CP-P1, RNF-7 parcial).
+- **Decisiones técnicas:**
+  - Región `us-east-1`; instancia **Ubuntu 24.04 LTS `t2.micro`** (Free Tier) con EBS `gp3` 20 GB.
+  - Key pair `energyshark` (`.pem` en `~/.ssh/`, `chmod 400`, **fuera del repo**).
+  - **SG EC2**: SSH (22) solo desde mi IP, 80 y 443 abiertos (prepara Nginx/HTTPS); puerto 3000 nunca expuesto.
+  - **SG RDS**: 5432 solo desde el SG de la EC2; RDS `postgres` 16, `db.t3.micro`, `gp3` 20 GB, sin Multi-AZ, `public accessibility: false`.
+  - **Elastic IP** asociada (IP fija para el registro A de la Etapa 9).
+  - **Docker Engine + Compose plugin** en la EC2 (repos oficiales, usuario en grupo `docker`); usuario propio `energyshark` con sudo (hardening básico).
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental). Pendiente para la ejecución: confirmar el AMI de Ubuntu en la región, mi IP actual al abrir el SG y el estado de Free Tier de la cuenta.
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-07-aws-ec2-rds.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron los datos de la bitácora (usuario IAM `energyshark-deploy`, región us-east-1) y las reglas de seguridad del proyecto (`.pem` jamás versionado).
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-07-aws-ec2-rds.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 7.1–7.6; checkpoint CP-P1)
+
+---
+
+## Entrada 16 — Etapa 7 — Infraestructura AWS: EC2 + RDS (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 7.2–7.6 de la Etapa 7: crear la infraestructura AWS (key pair, Security Groups, EC2, Docker, Elastic IP y RDS) y verificar el checkpoint CP-P1.
+- **Recursos creados** (IDs y endpoint, **sin secretos**):
+
+  | Recurso | Valor |
+  | --- | --- |
+  | Instancia EC2 | `i-001abcc637483ce58` |
+  | IP pública / Elastic IP | `3.216.254.80` |
+  | SG EC2 | `sg-092d5b2ce9377dee0` (`energyshark-ec2`) |
+  | SG RDS | `sg-0215b94a3a77894cd` (`energyshark-rds`) |
+  | Endpoint RDS | `energyshark.cy3ceaoa6tdt.us-east-1.rds.amazonaws.com` |
+
+- **Decisiones técnicas:** las registradas en `etapas/etapa-07-aws-ec2-rds.md` (sección 5). Se confirmó la IP pública fija (destino del registro A en la Etapa 9) y el endpoint interno del RDS.
+- **Problemas encontrados y solución:** Sin bloqueos relevantes; la ejecución fue manual por AWS CLI (sin código de aplicación). El `.pem` permanece en `~/.ssh/` y **no** se versiona.
+- **Comandos importantes:**
+  ```bash
+  aws ec2 describe-instances --filters "Name=tag:Name,Values=energyshark" \
+    --query "Reservations[*].Instances[*].[InstanceId, PublicIpAddress]" --output text
+  aws ec2 describe-security-groups --filters "Name=group-name,Values=*energyshark*"
+  aws rds describe-db-instances --db-instance-identifier energyshark \
+    --query "DBInstances[0].Endpoint.Address" --output text
+  ```
+- **Resultado de pruebas:** EC2 `running` con IP pública fija; SGs `energyshark-ec2` y `energyshark-rds` creados; RDS `available` con endpoint interno (5432 solo desde la EC2); Docker Engine + Compose instalados en la EC2. **CP-P1 alcanzado.**
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-07-cierre-auditoria.md`
+- **Estado:** Verificado en producción (checkpoint CP-P1 alcanzado)
+
+
+
