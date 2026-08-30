@@ -8,7 +8,11 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | --- | --- |
 | 0 — Plan Maestro | Completado |
 | 1 — Preparación del entorno | En progreso (cierre documental) |
-| 2–15 | Pendientes |
+| 2 — Diseño de arquitectura | Completado |
+| 3 — PoC RabbitMQ | Verificado localmente (CP-L3) |
+| 4 — Servicio `master` (local) | Verificado localmente (CP-L4) |
+| 5 — Servicio `connector` (local) | Verificado localmente (CP-L5) |
+| 6–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -60,7 +64,8 @@ flowchart LR
 ```text
 /
 ├── apps/
-│   ├── connector/          ← Consumidor AMQP + reenvío HTTP
+│   ├── connector/          ← Consumidor AMQP + reenvío HTTP (NestJS standalone)
+│   │   └── poc/            ← PoC de la Etapa 3 (referencia)
 │   └── master/             ← API REST NestJS
 ├── etapas/                 ← Documentación por etapas (una etapa = un archivo)
 ├── ai_docs/prompts/        ← Registro obligatorio del uso de IA
@@ -73,11 +78,15 @@ flowchart LR
 
 | ID | Requisito | Estado |
 | --- | --- | --- |
-| RF1 | Historial de demanda eléctrica | Pendiente |
-| RF2 | Detalle de un registro (`/history/{id}`) | Pendiente |
-| RF3 | Paginación (default 25) | Pendiente |
-| RF4 | Filtros (incl. `receivedAt` y fechas) | Pendiente |
-| RNF | Separación de servicios, resiliencia, Docker, AWS, dominio, Nginx, HTTPS | Pendientes |
+| RF1 | Historial de demanda eléctrica | Verificado localmente |
+| RF2 | Detalle de un registro (`/history/{id}`) | Verificado localmente |
+| RF3 | Paginación (default 25) | Verificado localmente |
+| RF4 | Filtros (incl. `receivedAt` y fechas) | Verificado localmente |
+| RNF-1 | Separación de servicios `connector`/`master` | Verificado localmente |
+| RNF-2 | `connector` → `master` vía HTTP POST | Verificado localmente |
+| RNF-3 | Reconexión automática a RabbitMQ | Verificado localmente |
+| RNF-4 | `master` operativo sin RabbitMQ/connector | Verificado localmente |
+| RNF-5..10, DOC, ENT | Dockerización, AWS, dominio, Nginx, HTTPS, entrega | Pendientes |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
@@ -94,9 +103,26 @@ Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 - Contraseñas y access keys viven únicamente en archivos locales fuera del control de versiones.
 - En producción, los secretos se guardan en el host EC2, no en el repositorio.
 
-## Quickstart
+## Quickstart (entorno local)
 
-En construcción: estará disponible a partir de la Etapa 4 (API local) y la Etapa 6 (Docker Compose).
+Prerrequisitos: Node.js LTS, Docker Desktop y las variables de entorno en un `.env` (ver `.env.example`).
+
+```bash
+# 1. PostgreSQL de desarrollo (contenedor)
+docker run -d --name energy-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=energy_db -p 5432:5432 -v energy_pgdata:/var/lib/postgresql/data postgres:16
+
+# 2. API master (NestJS)
+cd apps/master && npm install && npm run migration:run && npm run start
+#    → http://localhost:3000 · health: curl http://localhost:3000/health
+
+# 3. Connector (consumo AMQP + reenvío)
+cd apps/connector && npm install && npm run start
+#    → consume observer.45.q y reenvía a POST http://localhost:3000/events
+```
+
+Flujo end-to-end verificado en local: RabbitMQ → connector → master → PostgreSQL.
+Docker Compose (un solo comando) llegará en la **Etapa 6**.
 
 ## Uso de IA
 
