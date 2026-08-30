@@ -12,7 +12,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 3 — PoC RabbitMQ | Verificado localmente (CP-L3) |
 | 4 — Servicio `master` (local) | Verificado localmente (CP-L4) |
 | 5 — Servicio `connector` (local) | Verificado localmente (CP-L5) |
-| 6–15 | Pendientes |
+| 6 — Dockerización + Docker Compose | Verificado localmente (CP-L6) |
+| 7–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -65,8 +66,11 @@ flowchart LR
 /
 ├── apps/
 │   ├── connector/          ← Consumidor AMQP + reenvío HTTP (NestJS standalone)
+│   │   ├── Dockerfile      ← Imagen multi-stage
 │   │   └── poc/            ← PoC de la Etapa 3 (referencia)
 │   └── master/             ← API REST NestJS
+│       └── Dockerfile      ← Imagen multi-stage
+├── compose.yaml            ← Docker Compose de desarrollo (master + connector + postgres)
 ├── etapas/                 ← Documentación por etapas (una etapa = un archivo)
 ├── ai_docs/prompts/        ← Registro obligatorio del uso de IA
 ├── docs/bitacora.md        ← Bitácora técnica del proyecto
@@ -86,7 +90,9 @@ flowchart LR
 | RNF-2 | `connector` → `master` vía HTTP POST | Verificado localmente |
 | RNF-3 | Reconexión automática a RabbitMQ | Verificado localmente |
 | RNF-4 | `master` operativo sin RabbitMQ/connector | Verificado localmente |
-| RNF-5..10, DOC, ENT | Dockerización, AWS, dominio, Nginx, HTTPS, entrega | Pendientes |
+| RNF-5 | Dockerización + HEALTHCHECK por contenedor | Verificado localmente |
+| RNF-6 | Docker Compose (master + connector + postgres local) | Verificado localmente |
+| RNF-7..10, DOC, ENT | AWS, dominio, Nginx, HTTPS, entrega | Pendientes |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
@@ -103,9 +109,18 @@ Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 - Contraseñas y access keys viven únicamente en archivos locales fuera del control de versiones.
 - En producción, los secretos se guardan en el host EC2, no en el repositorio.
 
-## Quickstart (entorno local)
+## Quickstart
 
-Prerrequisitos: Node.js LTS, Docker Desktop y las variables de entorno en un `.env` (ver `.env.example`).
+### Con Docker Compose (recomendado)
+
+```bash
+cp .env.example .env   # completar credenciales (RABBITMQ_URL, DB_*, etc.)
+docker compose up --build -d   # postgres + master + connector (red interna)
+docker compose ps              # los tres contenedores deben estar "healthy"
+curl http://localhost:3000/health   # { "status": "ok", "db": "up" }
+```
+
+### Sin Docker (servicios locales)
 
 ```bash
 # 1. PostgreSQL de desarrollo (contenedor)
@@ -114,15 +129,13 @@ docker run -d --name energy-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSW
 
 # 2. API master (NestJS)
 cd apps/master && npm install && npm run migration:run && npm run start
-#    → http://localhost:3000 · health: curl http://localhost:3000/health
 
 # 3. Connector (consumo AMQP + reenvío)
 cd apps/connector && npm install && npm run start
-#    → consume observer.45.q y reenvía a POST http://localhost:3000/events
 ```
 
-Flujo end-to-end verificado en local: RabbitMQ → connector → master → PostgreSQL.
-Docker Compose (un solo comando) llegará en la **Etapa 6**.
+Flujo end-to-end verificado en local y en contenedores: RabbitMQ → connector → master → PostgreSQL.
+La infraestructura en AWS (EC2 + RDS) llega en las **Etapas 7–8**.
 
 ## Uso de IA
 
