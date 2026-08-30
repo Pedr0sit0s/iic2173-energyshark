@@ -58,3 +58,7 @@ ai_docs/
 | 2026-08-30 | `prompts/2026-08-30-etapa-12-cierre-auditoria.md` | Etapa 12: cierre (resiliencia y health checks, documentación y versionado) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-13-trazabilidad-auditoria.md` | Inicio de la Etapa 13 (trazabilidad y auditoría) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-13-cierre-auditoria.md` | Etapa 13: cierre (trazabilidad y auditoría, documentación y versionado) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-14-documentacion-ia-bitacora.md` | Inicio de la Etapa 14 (documentación de IA y bitácora) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-14-cierre-auditoria.md` | Etapa 14: cierre (verificación del registro de IA y bitácora) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-15-entrega-final.md` | Inicio de la Etapa 15 (entrega final) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-15-cierre-auditoria.md` | Etapa 15: cierre (entrega final, documentación y versionado) |
