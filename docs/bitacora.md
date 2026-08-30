@@ -34,6 +34,8 @@
 | 10 | 2026-08-29 | Etapa 4 — Servicio `master` local (ejecución y cierre) |
 | 11 | 2026-08-29 | Etapa 5 — Servicio `connector` local (planificación e inicio) |
 | 12 | 2026-08-29 | Etapa 5 — Servicio `connector` local (ejecución y cierre) |
+| 13 | 2026-08-29 | Etapa 6 — Dockerización y Docker Compose (planificación e inicio) |
+| 14 | 2026-08-29 | Etapa 6 — Dockerización y Docker Compose (ejecución y cierre) |
 
 ---
 
@@ -370,3 +372,66 @@ git branch -M main
   - **RNF-2** (connector→master vía HTTP) ✓ · **RNF-3** (reconexión automática) ✓ · **RNF-1** (separación de servicios) ✓ · **CP-L5** alcanzado.
 - **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-05-ejecucion-cierre.md`
 - **Estado:** Verificado localmente (checkpoint CP-L5 alcanzado)
+
+---
+
+## Entrada 13 — Etapa 6 — Dockerización y Docker Compose (planificación e inicio)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Iniciar la Etapa 6 según el Plan Maestro: generar el plan detallado `etapas/etapa-06-docker-compose.md` y dejar lista la hoja de ruta para dockerizar `master` y `connector` y orquestarlos con Compose (checkpoint CP-L6, RNF-5/RNF-6).
+- **Decisiones técnicas:**
+  - **Dockerfile multi-stage** por servicio (`node:24-alpine`): etapa build (compila TS) y runtime (`npm ci --omit=dev` + `dist/`), sin devDependencies en producción.
+  - **Migraciones en contenedor**: nuevo script `migration:run:prod` (`typeorm migration:run -d dist/data-source.js`) porque `typeorm-ts-node-commonjs` requiere `ts-node` (devDep) y TS fuente; el comando del contenedor de `master` ejecuta migraciones y luego `node dist/main`.
+  - **`compose.yaml` en la raíz**: `postgres` + `master` + `connector` en la red interna de Compose; `connector` usa `MASTER_URL=http://master:3000`; volumen nombrado `energy_pgdata`; `depends_on` con `condition: service_healthy`.
+  - **HEALTHCHECK por contenedor**: `pg_isready` (postgres), `fetch` real a `/health` con `node -e` (master, sin instalar curl en Alpine) y **heartbeat file** en `AmqpService` + `stat -c %Y` (connector, validación operativa real).
+  - Variables de entorno vía `environment:` de Compose (valores desde el `.env` host no versionado), sin montar el `.env` dentro del contenedor.
+  - Broker RabbitMQ del curso externo (no se conteneriza); opcional `rabbitmq:3` con `profile` para pruebas controladas.
+- **Problemas encontrados y solución:** El comando `migration:run` local no funciona en runtime (depende de `ts-node`/TS): se resuelve con `migration:run:prod` sobre la DataSource compilada. Sin otros problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-06-docker-compose.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron las decisiones y aprendizajes de las Etapas 4–5 (migraciones, health check, `MASTER_URL` en la red).
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-06-docker-compose.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 6.1–6.5; checkpoint CP-L6)
+
+---
+
+## Entrada 14 — Etapa 6 — Dockerización y Docker Compose (ejecución y cierre)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Ejecutar las sub-etapas 6.1–6.5 de la Etapa 6: Dockerfiles multi-stage de `master` y `connector`, `compose.yaml` de desarrollo, HEALTHCHECK por contenedor y pruebas (build, arranque, flujo real y resiliencia), alcanzando el checkpoint CP-L6 (RNF-5/RNF-6).
+- **Decisiones técnicas:**
+  - **Dockerfiles multi-stage** (`node:24-alpine`): etapa build (`npm ci` + `nest build`) y runtime (`npm ci --omit=dev` + `dist/`, sin devDependencies ni TS fuente). `.dockerignore` excluye `node_modules`, `dist`, `.env` y, en `connector`, también `poc/`.
+  - **`migration:run:prod`** (`typeorm migration:run -d dist/data-source.js`): las migraciones corren con la DataSource compilada y el binario `typeorm` (dependencia de producción), sin `ts-node`. El `command` del contenedor de `master` es `sh -c "npm run migration:run:prod && node dist/main"`.
+  - **`compose.yaml`** en la raíz (`name: energyshark`): `postgres:16` (volumen `energy_pgdata`, host 5432), `master` (host 3000, `DB_HOST=postgres`/`DB_PORT=5432`), `connector` (`MASTER_URL=http://master:3000`, broker del curso externo). `depends_on` con `condition: service_healthy` ordena el arranque; `restart: unless-stopped` en todos. Variables vía `environment:` interpoladas desde el `.env` host (no versionado).
+  - **HEALTHCHECK por contenedor**: postgres `pg_isready`; master `node -e fetch(.../health)` (sin curl en Alpine); connector **heartbeat** implementado en `AmqpService` (escribe `/tmp/connector-heartbeat` cada 5 s; se inicia en `onApplicationBootstrap` y se limpia en `onApplicationShutdown`) validado con `stat -c %Y` (antigüedad < 15 s).
+  - **`main.ts` de master ya lee `PORT`** de `ConfigService` (no hardcodeado), lo que permite fijar el puerto vía entorno en el contenedor.
+- **Problemas encontrados y solución:**
+  - **`CMD-SHELL` no existe en HEALTHCHECK de Dockerfile** (es sintaxis de Compose): el HEALTHCHECK del connector se corrigió a la forma shell de Docker (`CMD test $(( ... )) -lt 15`). Además, en Dockerfile **`$$` NO se escapa a `$`** (a diferencia de Compose): el shell veía `$$` (PID) y rompía la aritmética; se usó `$` simple.
+  - **Puertos host ocupados**: `:3000` (master local de la Etapa 5) y `:5432` (PostgreSQL de Homebrew). Se detuvieron los servicios locales antes de `docker compose up` y se **restauraron al final** (`brew services start postgresql@17`). El contenedor `energy-postgres` (host 5433) no compite y quedó intacto.
+  - **El usuario `observer.45` del curso solo tiene permiso de CONSUMO** (`ACCESS_REFUSED` al publicar): las pruebas de resiliencia se hicieron con eventos reales del curso, aprovechando su cadencia (~1/30 s) y el reintento del connector.
+  - **Revisión post-entrega (2026-08-29)**: se agregó el script `typecheck` (`tsc --noEmit`) a `apps/master` (que no lo tenía, a diferencia de `connector`). Se confirmó que `ts-node` presente en el runtime **no es un error del Dockerfile**: es dependencia de producción transitiva de `typeorm@1.x`, por lo que `npm ci --omit=dev` la instala igual; no se usa en runtime y no afecta la imagen. Verificación en la auditoría: `docker build` de ambas imágenes, `docker compose config`, `npm run build`/`lint`/`typecheck` y `npm test` (4/4) en verde.
+- **Comandos importantes:**
+  ```bash
+  docker compose config                        # validar sintaxis
+  docker compose up --build -d                 # construir y arrancar (todo healthy)
+  docker compose ps
+  docker compose logs connector master
+  docker compose restart master                # resiliencia: connector reintenta y recupera
+  docker compose restart connector             # se reconecta y vuelve a consumir
+  docker compose stop postgres && docker compose start postgres
+  docker compose down                          # detener (conserva el volumen)
+  docker inspect --format '{{json .State.Health}}' energyshark-master-1
+  ```
+- **Resultado de pruebas:**
+  - **Imágenes**: `energyshark-master` (385 MB) y `energyshark-connector` (303 MB) construidas; `npm run build` pasa en ambas apps y `npm test` del connector 4/4.
+  - **Arranque ordenado**: postgres → (healthy) → master (migraciones + `node dist/main`) → (healthy) → connector → (healthy). `docker compose ps` mostró los tres `healthy`.
+  - **API**: `GET /health` → 200 `{status: ok, db: up}`; `GET /history` creció hasta **97 eventos reales** del curso con `receivedAt` UTC; tabla `history` e índices verificados con `\d history` en el postgres de Compose (migraciones aplicadas automáticamente).
+  - **Flujo interno**: el connector logueó `ACK tag=... status=201` usando `MASTER_URL=http://master:3000` (red interna) y la contraseña del broker enmascarada (`observer.45:***`).
+  - **Resiliencia (todo automático, sin intervención):**
+    | # | Prueba | Resultado |
+    | --- | --- | --- |
+    | 1 | `docker compose restart master` | connector con `REINTENTO intento=1/5..4/5 motivo=fetch failed`; al volver master → `ACK 201`; evento `f07bd93c-...` persistido (02:37:24 UTC) |
+    | 2 | `docker compose restart connector` | reconexión (`CONECTANDO amqps://observer.45:***@...`) → `ESCUCHANDO` → `ACK tag=1` (canal nuevo) |
+    | 3 | `docker compose stop postgres` → `start` | `/health` degradó a **503** con la DB caída y volvió a **200** en el primer chequeo tras arrancar postgres |
+  - **RNF-5** (Docker + HEALTHCHECK) ✓ · **RNF-6** (Compose master+connector+postgres) ✓ · **CP-L6** alcanzado.
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-06-docker-ejecucion-cierre.md`
+- **Estado:** Verificado localmente (checkpoint CP-L6 alcanzado)
