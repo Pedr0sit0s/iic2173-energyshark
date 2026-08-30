@@ -47,7 +47,7 @@
 | 6 | `etapa-06-docker-compose.md` | Dockerización de ambos servicios + Compose + health checks | Verificado localmente |
 | 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Verificado en producción |
 | 8 | `etapa-08-primer-despliegue.md` | Primer despliegue funcional en EC2 (MVP en producción) | Verificado en producción |
-| 9 | `etapa-09-dominio-dns.md` | Dominio Namecheap, registro A y propagación DNS | Pendiente |
+| 9 | `etapa-09-dominio-dns.md` | Dominio Namecheap, registro A y propagación DNS | Verificado en producción |
 | 10 | `etapa-10-nginx-reverse-proxy.md` | Nginx en el host EC2 como reverse proxy | Pendiente |
 | 11 | `etapa-11-https-letsencrypt.md` | HTTPS con Let's Encrypt + renovación automática | Pendiente |
 | 12 | `etapa-12-resiliencia-healthchecks.md` | Pruebas de resiliencia y validación de health checks | Pendiente |
@@ -61,4 +61,4 @@ La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3�
 
 ## Siguiente etapa recomendada
 
-**Etapa 9** (`etapa-09-dominio-dns.md`) — Dominio y DNS: registrar/verificar el dominio `persito.online` en Namecheap, crear el **registro A** apuntando a la Elastic IP `3.216.254.80` y verificar la propagación con `dig` (checkpoint CP-P3).
+**Etapa 10** (`etapa-10-nginx-reverse-proxy.md`) — Nginx como reverse proxy (en el host): instalar Nginx en la EC2 (no en contenedor), server block HTTP con `server_name persito.online` y `proxy_pass` a `127.0.0.1:3000`, cerrar puertos directos vía Security Groups y revisar logs (checkpoint CP-P4).
