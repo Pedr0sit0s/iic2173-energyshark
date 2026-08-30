@@ -32,6 +32,8 @@
 | 8 | 2026-08-29 | Etapa 3 — PoC RabbitMQ (ejecución, refactor y cierre) |
 | 9 | 2026-08-29 | Etapa 4 — Servicio `master` local (planificación e inicio) |
 | 10 | 2026-08-29 | Etapa 4 — Servicio `master` local (ejecución y cierre) |
+| 11 | 2026-08-29 | Etapa 5 — Servicio `connector` local (planificación e inicio) |
+| 12 | 2026-08-29 | Etapa 5 — Servicio `connector` local (ejecución y cierre) |
 
 ---
 
@@ -300,3 +302,71 @@ git branch -M main
   - **RF1** (lista) ✓ · **RF2** (detalle + 404) ✓ · **RF3** (paginación) ✓ · **RF4** (filtros) ✓ · **RNF-4** (master sin RabbitMQ) ✓ · **RNF-5 parcial** (`/health`) ✓.
 - **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-04-ejecucion-cierre.md`
 - **Estado:** Verificado localmente (checkpoint CP-L4 alcanzado)
+
+---
+
+## Entrada 11 — Etapa 5 — Servicio `connector` local (planificación e inicio)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Iniciar la Etapa 5 según el Plan Maestro: generar el plan detallado `etapas/etapa-05-connector-local.md` y dejar lista la hoja de ruta para construir el `connector` como app NestJS standalone y cerrar el flujo end-to-end local (checkpoint CP-L5).
+- **Decisiones técnicas:**
+  - App **NestJS standalone** (`createApplicationContext`, sin servidor HTTP) en `apps/connector`, conservando la carpeta `poc/` de la Etapa 3 como referencia.
+  - Cliente AMQP: **`amqplib`** con `prefetch(1)`, consumo de `observer.45.q` y reconexión con backoff exponencial + jitter (función pura `computeBackoffDelay`).
+  - Reenvío HTTP con **`fetch` nativo** + `AbortSignal.timeout` (5–10 s); **ack solo tras 2xx**. 4xx → `nack(requeue:false)`; 5xx/timeout/red → reintento con tope (ej. 5) → `nack(requeue:false)`.
+  - `ConfigModule` con validación fail-fast (`RABBITMQ_URL`, `RABBITMQ_QUEUE`, `MASTER_URL`, `REQUEST_TIMEOUT_MS`); lifecycle hooks `OnApplicationBootstrap`/`OnApplicationShutdown`.
+  - Logging estructurado con timestamp UTC y contexto por evento (patrón del PoC refactorizado).
+- **Problemas encontrados y solución:** El scaffold de Nest CLI pisaría `apps/connector/poc`; se resolverá generando el scaffold en una carpeta temporal y moviendo el contenido a `apps/connector`. Sin otros problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-05-connector-local.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron los aprendizajes de las Etapas 2–4 (contrato connector→master, cola confirmada `observer.45.q`, patrón de backoff del PoC).
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-05-connector-local.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 5.1–5.5; checkpoint CP-L5)
+
+---
+
+## Entrada 12 — Etapa 5 — Servicio `connector` local (ejecución y cierre)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Ejecutar las sub-etapas 5.1–5.5 de la Etapa 5: app NestJS standalone en `apps/connector`, consumidor AMQP robusto, reenvío HTTP con ack/nack y logging estructurado, cerrando el flujo end-to-end local RabbitMQ → connector → master → DB (checkpoint CP-L5, RNF-2/RNF-3).
+- **Decisiones técnicas:**
+  - **App NestJS standalone** (`NestFactory.createApplicationContext`, `logger: false` para no mezclar el logger de Nest con el estructurado propio) en `apps/connector`, conservando `poc/`. Scaffold escrito a mano (sin `nest new`): toolchain idéntico al de `master` (@nestjs/cli 12, TS 6) + **jest 30 + ts-jest 29.4.12** (par compatible, a diferencia de `master` donde quedó roto) → `npm test` funciona (4/4).
+  - **`ConfigModule` con validación** fail-fast (`src/config/env.validation.ts`): `RABBITMQ_URL` validada con `IsUrl` (protocolos `amqps`/`amqp`), `MASTER_URL` con `IsUrl`, `REQUEST_TIMEOUT_MS` (default 5000) y `MAX_FORWARD_RETRIES` (default 5) con `IsInt` + rango. Carga `.env` raíz y `apps/connector/.env` (si existe), con `envFilePath` absoluto desde `__dirname`.
+  - **Backoff centralizado** en `src/amqp/backoff.ts` (función pura `computeBackoffDelay`, misma fórmula del PoC) + **test unitario** (`backoff.spec.ts`, 4 casos).
+  - **`AmqpService`** con `OnApplicationBootstrap`/`OnApplicationShutdown`: `prefetch(1)`, `consume(queue, handler, { noAck: false })`, reconexión con backoff (base 1 s, cap 30 s, jitter 1 s, reintentos infinitos) y apagado limpio (bandera `shuttingDown` + limpieza del timer de reconexión). El handler delega en `ForwardService`.
+  - **`ForwardService`** con `fetch` + `AbortSignal.timeout`: 2xx → `ack`; 4xx → `nack(requeue:false)` + log del body de `master`; 5xx/timeout/red → reintento con backoff (tope 5) → `nack(requeue:false)`.
+  - **Logging estructurado** (`src/common/logger.ts`): `[timestamp UTC] NIVEL mensaje`, contexto por evento (`tag`, `idpk`, `type`), sin emojis; `formatUrl` oculta la contraseña de `RABBITMQ_URL` en los logs.
+- **Problemas encontrados y solución:**
+  - **`@nestjs/schematics@12` exige TypeScript ≥ 6**: subí TS a `^6.0.2` (consistente con `master`) y usé **ts-jest 29.4.12** (soporta TS < 7 y jest 30) para que `npm test` funcionara.
+  - **ts-jest error TS5011** (rootDir): se agregó `"rootDir": "./src"` al `tsconfig.json`.
+  - **Pruebas contra el broker real poco controlables**: la cola del curso publica ráfagas y los mensajes de prueba quedaban atrás de la cola / expiraban (TTL). Para las pruebas de resiliencia se usó un **RabbitMQ local en Docker** (`rabbitmq:3`) con una cola de prueba `test.q`, apuntando un segundo conector vía variables de entorno (`RABBITMQ_URL`/`RABBITMQ_QUEUE`/`MASTER_URL`). El conector no declara colas (constraint de producción): la cola local se declaró con `assertQueue` en el script de prueba.
+  - **`pkill -f "node dist/main"` mataba también a `master`** (mismo comando): para matar solo `master` se usó `lsof -ti :3000 -sTCP:LISTEN`.
+  - **Revisión post-entrega (2026-08-29)**: `tsc --noEmit` incluía por defecto `apps/connector/poc/` y `jest.config.ts`, fuera de `rootDir` (TS6059); se agregó `"include": ["src"]` al `tsconfig.json` y `typecheck` quedó en verde. En `AmqpService.connect()` se agrega limpieza de la conexión si el canal/consumo falla a mitad de la conexión. Se eliminó `apps/connector/.gitkeep` (directorio ya poblado) y se creó el `README.md` del servicio.
+- **Comandos importantes:**
+  ```bash
+  cd apps/connector && npm install && npm run build && npm test
+  npm run start                      # consume observer.45.q del broker del curso
+  # Pruebas controladas con broker local:
+  docker run -d --name e5-rabbit -p 5672:5672 rabbitmq:3
+  RABBITMQ_URL=amqp://guest:guest@localhost:5672 RABBITMQ_QUEUE=test.q node dist/main
+  docker stop e5-rabbit && docker start e5-rabbit   # prueba de reconexión
+  ```
+- **Resultado de pruebas:** (evidencia en `/tmp/connector.log` y `/tmp/connector-local.log`)
+
+  **End-to-end real (broker del curso):**
+  - El conector consumió 400+ eventos `demand-set` reales, los reenvió a `POST /events` (201) e hizo ack; `master` llegó a **437 registros** y `psql` confirma `receivedAt` en UTC:
+    `e1c877c2-... | demand-set | 2026-08-30 01:45:06.55+00`.
+  - Con `master` detenido: `REINTENTO intento=1/5 ... motivo=fetch failed` → tras 5 reintentos `NACK_AGOTADO reintentos=5` (descartado con log, sin bloquear la cola). Al volver `master`: `ACK status=201`.
+
+  **Pruebas controladas (broker local):**
+  | # | Prueba | Resultado |
+  | --- | --- | --- |
+  | 1 | `npm test` (backoff) | 4/4 OK |
+  | 2 | Marcadores A–C con `master` arriba | `ACK tag=... status=201` y persistidos (6 marcadores en DB) |
+  | 3 | `master` caído → evento pendiente | `REINTENTO` 1/5..5/5 (`fetch failed`); al volver `master`, el intento final → `ACK 201` y registrado en DB |
+  | 4 | Corte de red del broker (`docker stop`) | `Conexión cerrada por el broker` → `BACKOFF intento=1..5 espera=1.04s/2.47s/4.35s/8.69s/16.94s` → al volver (`docker start`) → `CONEXIÓN TCP establecida` → `ESCUCHANDO` y sigue consumiendo |
+  | 5 | Evento inválido (`idpk` no UUID) | `NACK_4XX status=400 body={"message":["idpk must be a UUID"]...}` y el conector sigue vivo |
+  | 6 | Apagado con SIGTERM | `Señal SIGTERM recibida. Cerrando...` → canal/conexión cerrados (shutdown ordenado) |
+  | 7 | `npm run build`, `typecheck`, `lint` | Sin errores |
+
+  - **RNF-2** (connector→master vía HTTP) ✓ · **RNF-3** (reconexión automática) ✓ · **RNF-1** (separación de servicios) ✓ · **CP-L5** alcanzado.
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-05-ejecucion-cierre.md`
+- **Estado:** Verificado localmente (checkpoint CP-L5 alcanzado)
