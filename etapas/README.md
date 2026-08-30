@@ -50,7 +50,7 @@
 | 9 | `etapa-09-dominio-dns.md` | Dominio Namecheap, registro A y propagación DNS | Verificado en producción |
 | 10 | `etapa-10-nginx-reverse-proxy.md` | Nginx en el host EC2 como reverse proxy | Verificado en producción |
 | 11 | `etapa-11-https-letsencrypt.md` | HTTPS con Let's Encrypt + renovación automática | Verificado en producción |
-| 12 | `etapa-12-resiliencia-healthchecks.md` | Pruebas de resiliencia y validación de health checks | Pendiente |
+| 12 | `etapa-12-resiliencia-healthchecks.md` | Pruebas de resiliencia y validación de health checks | Verificado en producción |
 | 13 | `etapa-13-trazabilidad-auditoria.md` | Trazabilidad de requisitos y auditoría contra el enunciado | Pendiente |
 | 14 | `etapa-14-documentacion-ia-bitacora.md` | Documentación de uso de IA y bitácora técnica | Pendiente |
 | 15 | `etapa-15-entrega-final.md` | Preparación de la entrega final | Pendiente |
@@ -61,4 +61,4 @@ La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3�
 
 ## Siguiente etapa recomendada
 
-**Etapa 12** (`etapa-12-resiliencia-healthchecks.md`) — Pruebas de resiliencia y health checks: caída/recuperación de RabbitMQ, reinicios de `connector`/`master`, consultas durante fallos, volumen de datos (paginación profunda y filtros con índices) y revisión de health checks y logs en producción (checkpoint CP-P6).
+**Etapa 13** (`etapa-13-trazabilidad-auditoria.md`) — Trazabilidad de requisitos y auditoría: matriz de trazabilidad actualizada con evidencia por requisito, auditoría completa contra el enunciado y cierre de brechas (checkpoint CP-L7).
