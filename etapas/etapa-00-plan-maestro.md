@@ -226,31 +226,31 @@ Notas:
 
 ---
 
-## 5. Matriz de trazabilidad de requisitos (estado inicial)
+## 5. Matriz de trazabilidad de requisitos (estado actualizado)
 
-| Requisito | Descripción | Etapa(s) del plan | Estado |
-| --- | --- | --- | --- |
-| RF1 | Historial de demanda eléctrica (lista con campos relevantes) | 4, 8 | Verificado en producción |
-| RF2 | Detalle de un registro (`/history/{id}` con id propio) | 4, 8 | Verificado en producción |
-| RF3 | Paginación (default 25, `?page=2&limit=25`) | 4, 12 | Verificado en producción |
-| RF4 | Filtros sobre propiedades (incl. `receivedAt` y fechas) | 2, 4, 12 | Verificado en producción |
-| RNF-1 | Separación de servicios `connector` / `master` | 4, 5, 6 | Verificado en producción |
-| RNF-2 | `connector` → `master` vía HTTP POST | 2, 5 | Verificado en producción |
-| RNF-3 | Resiliencia: reconexión automática a RabbitMQ | 3, 5, 12 | Verificado en producción |
-| RNF-4 | `master` operativo sin RabbitMQ/connector | 4, 12 | Verificado en producción |
-| RNF-5 | Dockerización + HEALTHCHECK por contenedor | 6 | Verificado localmente |
-| RNF-6 | Docker Compose (master + connector + postgres local) | 6 | Verificado localmente |
-| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | 7, 8 | Verificado en producción |
-| RNF-8 | Dominio público y DNS hacia EC2 | 9 | Verificado en producción |
-| RNF-9 | Nginx reverse proxy instalado en el host | 10 | Verificado en producción |
-| RNF-10 | HTTPS con Let's Encrypt + renovación automática (≥ 2×/día) | 11 | Verificado en producción |
-| DOC-1 | Documentación de uso de IA (`ai_docs/prompts`) | 1, 14 | Pendiente |
-| DOC-2 | README completo y requisitos logrados/no logrados | 15 | Pendiente |
-| ENT-1 | Accesos para Canvas + `.pem` entregado, NO en GitHub | 15 | Pendiente |
+| Requisito | Descripción | Etapa(s) del plan | Estado | Evidencia |
+| --- | --- | --- | --- | --- |
+| RF1 | Historial de demanda eléctrica (lista con campos relevantes) | 4, 8 | Verificado en producción | `curl http://127.0.0.1:3000/history` en EC2; bitácora Entradas 10 y 18 |
+| RF2 | Detalle de un registro (`/history/{id}` con id propio) | 4, 8 | Verificado en producción | `GET /history/:id` (200/404) en EC2; bitácora Entradas 10 y 18 |
+| RF3 | Paginación (default 25, `?page=2&limit=25`) | 4, 12 | Verificado en producción | `?page=&limit=` en EC2; bitácora Entradas 10 y 18 |
+| RF4 | Filtros sobre propiedades (incl. `receivedAt` y fechas) | 2, 4, 12 | Verificado en producción | `?type=&city=&receivedAtFrom/To=` en EC2; bitácora Entradas 10 y 18 |
+| RNF-1 | Separación de servicios `connector` / `master` | 4, 5, 6 | Verificado en producción | `etapas/etapa-02-diseno-arquitectura.md`; apps independientes desplegadas (bitácora Entrada 18) |
+| RNF-2 | `connector` → `master` vía HTTP POST | 2, 5 | Verificado en producción | `etapas/etapa-05-connector-local.md`; `POST /events` + ack en EC2 (bitácora Entradas 12 y 18) |
+| RNF-3 | Resiliencia: reconexión automática a RabbitMQ | 3, 5, 12 | Verificado en producción | Bitácora Entradas 8 (PoC), 12 (local) y 26 (Etapa 12, producción) |
+| RNF-4 | `master` operativo sin RabbitMQ/connector | 4, 12 | Verificado en producción | Bitácora Entrada 10 (Etapa 4: `master` aislado con DB local) |
+| RNF-5 | Dockerización + HEALTHCHECK por contenedor | 6 | Verificado en producción | `docker inspect --format '{{json .State.Health}}'` en EC2: `master` y `connector` en `healthy`; bitácora Entradas 14 y 18 |
+| RNF-6 | Docker Compose (master + connector + postgres local) | 6 | Verificado en producción | `compose.prod.yaml` (master + connector + RDS) con `docker compose ps` `healthy` en EC2; `compose.yaml` local con postgres (bitácora Entrada 14) |
+| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | 7, 8 | Verificado en producción | `etapas/etapa-07-aws-ec2-rds.md`; `aws rds describe-db-instances` (estado `available`); bitácora Entradas 16 y 18 |
+| RNF-8 | Dominio público y DNS hacia EC2 | 9 | Verificado en producción | `etapas/etapa-09-dominio-dns.md`; `dig persito.online` resuelve a la EIP; bitácora Entrada 20 |
+| RNF-9 | Nginx reverse proxy instalado en el host | 10 | Verificado en producción | `etapas/etapa-10-nginx-reverse-proxy.md`; `infra/nginx/energyshark.conf`; `curl https://persito.online/health`; bitácora Entrada 22 |
+| RNF-10 | HTTPS con Let's Encrypt + renovación automática (≥ 2×/día) | 11 | Verificado en producción | `etapas/etapa-11-https-letsencrypt.md`; `certbot certificates` y renovación en systemd timer; bitácora Entrada 24 |
+| DOC-1 | Documentación de uso de IA (`ai_docs/prompts`) | 1, 14 | Verificado localmente | `ai_docs/README.md` (índice) y `ai_docs/prompts/` (registro por etapa/iteración) |
+| DOC-2 | README completo y requisitos logrados/no logrados | 15 | Pendiente | Etapa 15 (entrega final) |
+| ENT-1 | Accesos para Canvas + `.pem` entregado, NO en GitHub | 15 | Pendiente | Etapa 15 (entrega final) |
 
 **Estados posibles:** `Pendiente` · `En progreso` · `Verificado localmente` · `Verificado en producción` · `Completado`
 
-> Esta matriz se actualiza en la Etapa 13 (y parcialmente al cierre de cada etapa).
+> Esta matriz se actualiza en la Etapa 13 (y parcialmente al cierre de cada etapa). La columna **Evidencia** referencia el archivo o comando que respalda el estado de cada requisito.
 
 ---
 
