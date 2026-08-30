@@ -41,3 +41,7 @@ ai_docs/
 | 2026-08-29 | `prompts/2026-08-29-etapa-05-connector-local.md` | Inicio de la Etapa 5 (servicio `connector` local) |
 | 2026-08-29 | `prompts/2026-08-29-etapa-05-ejecucion-cierre.md` | Etapa 5: ejecución (connector standalone) y cierre |
 | 2026-08-29 | `prompts/2026-08-29-etapa-05-auditoria-cierre.md` | Etapa 5: auditoría de código, cierre documental y commits granulares |
+| 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-compose.md` | Inicio de la Etapa 6 (Dockerización y Docker Compose) |
+| 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-ejecucion-cierre.md` | Etapa 6: ejecución (Docker y Compose) y cierre |
+| 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-auditoria-cierre.md` | Etapa 6: auditoría de código, cierre documental y commits granulares |
+| 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-ejecucion-cierre.md` | Etapa 6: ejecución (Docker) y cierre |
