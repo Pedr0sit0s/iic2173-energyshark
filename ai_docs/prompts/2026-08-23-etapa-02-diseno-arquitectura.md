@@ -15,7 +15,7 @@ Documento `etapa-02-diseno-arquitectura.md` con:
 - Dos diagramas Mermaid (flujo de eventos y flujo de consultas).
 - 10 decisiones técnicas con alternativas (monorepo, amqplib, TypeORM, modelo híbrido columnas/JSONB, `LIMIT/OFFSET`, `receivedAt` en master, región us-east-1, TLS obligatorio).
 - Modelo de datos de la tabla `history`, diseño de API (`/events`, `/history`, `/history/:id`, `/health`), contrato connector→master (ack tras 2xx) e inventario de variables de entorno dev/prod.
-- Incorporación de los datos reales de la bitácora: `broker.iic2173.org:5671` AMQPS, vhost `energy`, usuario `observer.45`, exchange `energy.x`.
+- Incorporación de los datos reales de la bitácora: `broker.iic2173.org:5671` AMQPS, vhost `energy`, usuario `observer.45`, exchange `fulfillment.x`.
 - Checklist de finalización, troubleshooting y registro para la bitácora.
 
 ## Uso dado

@@ -44,4 +44,5 @@ ai_docs/
 | 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-compose.md` | Inicio de la Etapa 6 (Dockerización y Docker Compose) |
 | 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-ejecucion-cierre.md` | Etapa 6: ejecución (Docker y Compose) y cierre |
 | 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-auditoria-cierre.md` | Etapa 6: auditoría de código, cierre documental y commits granulares |
-| 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-ejecucion-cierre.md` | Etapa 6: ejecución (Docker) y cierre |
+| 2026-08-30 | `prompts/2026-08-30-etapa-07-aws-ec2-rds.md` | Inicio de la Etapa 7 (Infraestructura AWS: EC2 + RDS) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-07-cierre-auditoria.md` | Etapa 7: cierre (auditoría, documentación y versionado granular) |
