@@ -81,7 +81,7 @@ Al terminar esta etapa tendremos un **script mínimo de prueba de concepto (PoC)
 | Puerto | `5671` (AMQPS/TLS) |
 | Virtual host | `energy` |
 | Usuario | `observer.45` |
-| Exchange | `energy.x` (NO lo tocamos: solo leemos de la cola) |
+| Exchange | `fulfillment.x` (NO lo tocamos: solo leemos de la cola) |
 | Cola asignada | `observer.45.q` (confirmada el 2026-08-29) |
 
 ---
@@ -109,7 +109,7 @@ Al terminar esta etapa tendremos un **script mínimo de prueba de concepto (PoC)
 ```mermaid
 flowchart LR
     subgraph Curso[Infraestructura del curso]
-        X[Exchange energy.x]
+        X[Exchange fulfillment.x]
         Q[Cola asignada]
     end
     subgraph PoC[apps/connector/poc · amqp-poc.ts]
@@ -295,7 +295,7 @@ git push
 | `ECONNREFUSED` / timeout en el puerto | El puerto 5671 puede estar bloqueado por un firewall de red local; probar `openssl s_client -connect broker.iic2173.org:5671` para aislar conectividad vs AMQP |
 | El script muere sin log de error | Las promesas no capturadas terminan el proceso: envolver `start()` en `try/catch` y manejar `process.on('unhandledRejection')` |
 | La conexión cae sin `close` aparente (silencio) | Fallo de red detectado por heartbeat: el `close` llega tras el timeout de heartbeat. Verificar que el manejador de `close` es lo único que gatilla la reconexión y que no hay un `process.exit` en el camino |
-| El consumidor no recibe nada | El exchange `energy.x` enruta hacia la cola asignada: es infraestructura del curso. Verificar que `RABBITMQ_QUEUE` es el nombre correcto y que el script está conectado (no en loop de reconexión) |
+| El consumidor no recibe nada | El exchange `fulfillment.x` enruta hacia la cola asignada: es infraestructura del curso. Verificar que `RABBITMQ_QUEUE` es el nombre correcto y que el script está conectado (no en loop de reconexión) |
 | `tsx` no encuentra el `.env` | El flag `--env-file=.env` se pasa junto a `tsx`; ejecutar desde `apps/connector/poc` o usar rutas absolutas |
 | Mensajes que reaparecen tras ack | El ack ocurre después de un error no capturado en el handler: el broker reencola. Mantener el handler defensivo (todo `try/catch`) |
 | Duplicados ocasionales | Esperable: semántica at-least-once (Etapa 2). El PoC no deduplica; la tolerancia real se implementa en `master`/`connector` |

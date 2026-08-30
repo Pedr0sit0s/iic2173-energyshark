@@ -87,7 +87,7 @@ Este documento es la referencia contra la cual se desarrollarán las Etapas 3–
 
 | Concepto | Aplicación en el proyecto |
 | --- | --- |
-| RabbitMQ | La infraestructura del curso publica eventos en el exchange `energy.x` y los enruta a **nuestra cola asignada**. El `connector` la consume con `basic.consume` por AMQPS (TLS). |
+| RabbitMQ | La infraestructura del curso publica eventos en el exchange `fulfillment.x` y los enruta a **nuestra cola asignada**. El `connector` la consume con `basic.consume` por AMQPS (TLS). |
 | Ack / at-least-once | `connector` solo confirma (ack) un mensaje **después** de que `master` lo persistió (HTTP 2xx). Un duplicado ocasional es aceptable; la pérdida de eventos, no. |
 | Reconexión AMQP | `connector` implementa backoff exponencial y nunca termina permanentemente por caída del broker (RNF-3). |
 | NestJS | `master` es una app NestJS con HTTP (controladores + TypeORM). `connector` es una app NestJS standalone (sin servidor HTTP) que usa el cliente AMQP. |
@@ -105,7 +105,7 @@ Este documento es la referencia contra la cual se desarrollarán las Etapas 3–
 | Puerto | `5671` (AMQPS/TLS) |
 | Virtual host | `energy` |
 | Usuario | `observer.45` |
-| Exchange | `energy.x` |
+| Exchange | `fulfillment.x` |
 | Cola asignada | **Pendiente de confirmar — prerrequisito para la Etapa 3** |
 
 ---
@@ -135,7 +135,7 @@ Este documento es la referencia contra la cual se desarrollarán las Etapas 3–
 flowchart LR
     subgraph Curso[Infraestructura del curso]
         P[Producer del curso]
-        X[Exchange energy.x]
+        X[Exchange fulfillment.x]
         Q[Cola asignada<br/>al observer]
     end
     subgraph Docker[EC2 · Docker]

@@ -240,7 +240,7 @@ Notas:
 | RNF-4 | `master` operativo sin RabbitMQ/connector | 4, 12 | Verificado localmente |
 | RNF-5 | Dockerización + HEALTHCHECK por contenedor | 6 | Verificado localmente |
 | RNF-6 | Docker Compose (master + connector + postgres local) | 6 | Verificado localmente |
-| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | 7, 8 | Pendiente |
+| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | 7, 8 | En progreso |
 | RNF-8 | Dominio público y DNS hacia EC2 | 9 | Pendiente |
 | RNF-9 | Nginx reverse proxy instalado en el host | 10 | Pendiente |
 | RNF-10 | HTTPS con Let's Encrypt + renovación automática (≥ 2×/día) | 11 | Pendiente |

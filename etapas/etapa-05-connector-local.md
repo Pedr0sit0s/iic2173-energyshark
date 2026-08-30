@@ -108,7 +108,7 @@ Al terminar esta etapa tendremos el servicio **`connector`** corriendo en local 
 ```mermaid
 flowchart LR
     subgraph Curso[Infraestructura del curso]
-        X[Exchange energy.x]
+        X[Exchange fulfillment.x]
         Q[Cola observer.45.q]
     end
     C[connector<br/>NestJS standalone]

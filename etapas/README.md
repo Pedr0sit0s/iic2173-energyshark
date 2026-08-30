@@ -45,7 +45,7 @@
 | 4 | `etapa-04-master-api-local.md` | Servicio `master`: API REST + persistencia local (RF1–RF4) | Verificado localmente |
 | 5 | `etapa-05-connector-local.md` | Servicio `connector`: consumo AMQP + reenvío HTTP | Verificado localmente |
 | 6 | `etapa-06-docker-compose.md` | Dockerización de ambos servicios + Compose + health checks | Verificado localmente |
-| 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Pendiente |
+| 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Verificado en producción |
 | 8 | `etapa-08-primer-despliegue.md` | Primer despliegue funcional en EC2 (MVP en producción) | Pendiente |
 | 9 | `etapa-09-dominio-dns.md` | Dominio Namecheap, registro A y propagación DNS | Pendiente |
 | 10 | `etapa-10-nginx-reverse-proxy.md` | Nginx en el host EC2 como reverse proxy | Pendiente |
@@ -61,4 +61,4 @@ La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3�
 
 ## Siguiente etapa recomendada
 
-**Etapa 6** (`etapa-06-docker-compose.md`) — **Verificada localmente** (checkpoint CP-L6): `docker compose up --build -d` levanta `postgres` + `master` + `connector` con migraciones automáticas, HEALTHCHECK por contenedor y resiliencia ante reinicios (RNF-5, RNF-6). El flujo real funciona dentro de Docker. Próxima etapa: **Etapa 7 — Infraestructura AWS** (EC2 + RDS).
+**Etapa 8** (`etapa-08-primer-despliegue.md`) — Primer despliegue en producción (MVP en EC2): clonar el repo en la EC2, `.env` de producción, Compose de producción con `master` + `connector` conectados a RDS, verificación end-to-end y procedimiento de despliegue/rollback (checkpoint CP-P2).
