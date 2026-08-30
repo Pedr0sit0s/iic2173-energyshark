@@ -46,6 +46,8 @@
 | 22 | 2026-08-30 | Etapa 10 — Nginx reverse proxy (ejecución y cierre) |
 | 23 | 2026-08-30 | Etapa 11 — HTTPS con Let's Encrypt (planificación e inicio) |
 | 24 | 2026-08-30 | Etapa 11 — HTTPS con Let's Encrypt (ejecución y cierre) |
+| 25 | 2026-08-30 | Etapa 12 — Resiliencia y health checks (planificación e inicio) |
+| 26 | 2026-08-30 | Etapa 12 — Resiliencia y health checks (ejecución y cierre) |
 
 ---
 
@@ -690,3 +692,51 @@ git branch -M main
 - **Resultado de pruebas:** HTTPS 200 en `/health`, redirección 301 de HTTP, certificado Let's Encrypt válido ~90 días y renovación automática activa. **CP-P5 alcanzado**; RNF-10 y la parte variable (HTTPS) verificados.
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-11-cierre-auditoria.md`
 - **Estado:** Verificado en producción (checkpoint CP-P5 alcanzado)
+
+---
+
+## Entrada 25 — Etapa 12 — Resiliencia y health checks (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 12 según el Plan Maestro: generar el plan detallado `etapas/etapa-12-resiliencia-healthchecks.md` y dejar lista la hoja de ruta para verificar la resiliencia del sistema en producción (checkpoint CP-P6, RNF-1/RNF-3/RNF-4/RNF-5).
+- **Decisiones técnicas:**
+  - **Simular la caída del broker con iptables** (DROP del egress a `broker.iic2173.org:5671`, reversible): el broker del curso es compartido y no se puede detener; la regla en OUTPUT del host afecta al `connector` (bridge + NAT).
+  - Reinicios de `connector`/`master` con `docker compose restart` y verificación de recuperación automática.
+  - `/history` operativo durante el fallo (RNF-4); volumen con paginación profunda y filtros con `EXPLAIN ANALYZE`.
+  - Health checks con `docker ps`/`docker inspect` y revisión de logs (contenedores + Nginx).
+- **Problemas encontrados y solución:** El broker del curso no se puede detener (compartido y `observer.45` solo consume): se simula el corte con iptables de forma controlada. Sin otros problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-12-resiliencia-healthchecks.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones y 7 escenarios de prueba en producción.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-12-resiliencia-healthchecks.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 12.1–12.6; checkpoint CP-P6)
+
+---
+
+## Entrada 26 — Etapa 12 — Resiliencia y health checks (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 12.1–12.6 de la Etapa 12: verificar la resiliencia del sistema en producción (caída del broker, reinicios, `/history` durante fallos, volumen, health checks y logs) y alcanzar el checkpoint CP-P6.
+- **Resumen técnico:**
+  - **Caída de RabbitMQ (simulada con iptables, cadena `DOCKER-USER`, puerto 5671)**: el `connector` aplicó **BACKOFF exponencial** y se **reconectó automáticamente** al restaurar la red (RNF-1/RNF-3).
+  - **Caída de la API `master`** (contenedor detenido): el `connector` **retuvo los mensajes** (`REINTENTO` por timeout) y envió **ACK exitosos** al restaurar el contenedor (RNF-2).
+  - **Sin pérdida de datos**: total inicial `2265` → total final `2303` (38 mensajes procesados íntegramente tras las recuperaciones). Verificación en vivo: `total` alcanza **2351** eventos.
+  - **Paginación profunda**: `?page=50&limit=25` responde en **~0.55 s** (óptimo).
+  - **Índices en RDS**: `EXPLAIN ANALYZE` confirma **`Index Scan Backward using "IDX_history_received_at"`** (~0.405 ms), sin `Seq Scan` (RF3/RF4).
+  - Health checks: `master` y `connector` `healthy` (`docker ps`/`docker inspect`); `/health` → `{ status: ok, db: up }`.
+- **Verificación (evidencia real):**
+  ```text
+  $ curl https://persito.online/health
+  {"status":"ok","db":"up"}
+  $ curl "https://persito.online/history?limit=1"   # meta.total
+  total: 2351 · totalPages: 2351
+  $ curl -o /dev/null -w "%{http_code} %{time_total}s" "https://persito.online/history?page=50&limit=25"
+  HTTP 200 · 0.547384s
+  ```
+- **Problemas encontrados y solución:** El broker del curso es compartido y no se detiene; el corte se simuló con iptables en la cadena `DOCKER-USER` (controlado y reversible). Ningún otro problema relevante.
+- **Comandos importantes:** `sudo iptables -I DOCKER-USER -p tcp --dport 5671 -j DROP` (+ `-D` al restaurar), `docker compose -f compose.prod.yaml restart master`, `EXPLAIN ANALYZE ...` contra RDS.
+- **Resultado de pruebas:** Resiliencia verificada sin pérdida de datos; reconexión automática, reintentos de reenvío y paginación/filtros eficientes con índices. **CP-P6 alcanzado**; RNF-1..RNF-4, RF3 y RF4 verificados en producción.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-12-cierre-auditoria.md`
+- **Estado:** Verificado en producción (checkpoint CP-P6 alcanzado)
+
+
+---
