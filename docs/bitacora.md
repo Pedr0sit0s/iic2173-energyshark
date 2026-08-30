@@ -42,6 +42,8 @@
 | 18 | 2026-08-30 | Etapa 8 — Primer despliegue en producción (ejecución y cierre) |
 | 19 | 2026-08-30 | Etapa 9 — Dominio y DNS (planificación e inicio) |
 | 20 | 2026-08-30 | Etapa 9 — Dominio y DNS (ejecución y cierre) |
+| 21 | 2026-08-30 | Etapa 10 — Nginx reverse proxy (planificación e inicio) |
+| 22 | 2026-08-30 | Etapa 10 — Nginx reverse proxy (ejecución y cierre) |
 
 ---
 
@@ -577,3 +579,55 @@ git branch -M main
 - **Resultado de pruebas:** apex y `www` resuelven a `3.216.254.80` desde el resolver de Google y el local. **CP-P3 alcanzado**; RNF-4 verificado.
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-09-cierre-auditoria.md`
 - **Estado:** Verificado en producción (checkpoint CP-P3 alcanzado)
+
+---
+
+## Entrada 21 — Etapa 10 — Nginx reverse proxy (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 10 según el Plan Maestro: generar el plan detallado `etapas/etapa-10-nginx-reverse-proxy.md` y dejar lista la hoja de ruta para servir la API por el dominio vía Nginx en el host (checkpoint CP-P4, RNF-3/RNF-9).
+- **Decisiones técnicas:**
+  - **Nginx en el host EC2** (no en contenedor, obligatorio por el enunciado RNF-3), instalado por `apt` y gestionado por systemd.
+  - Server block `persito.online` + `www` con **`proxy_pass http://127.0.0.1:3000`** (el `master` publicado solo en localhost).
+  - Cabeceras de proxy completas (`Host`, `X-Real-IP`, `X-Forwarded-*`); configuración versionada en `infra/nginx/energyshark.conf` (regla del plan maestro).
+  - Puertos: solo 80/443 abiertos (SG); 3000 nunca expuesto.
+  - Logs en `/var/log/nginx/access.log` y `error.log`.
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-10-nginx-reverse-proxy.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron el dominio (`persito.online`), la EC2/IP y el backend `127.0.0.1:3000` de las etapas 8–9.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-10-nginx-reverse-proxy.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 10.1–10.4; checkpoint CP-P4)
+
+---
+
+## Entrada 22 — Etapa 10 — Nginx reverse proxy (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 10.1–10.4 de la Etapa 10: instalar Nginx en el host EC2, configurar el server block HTTP con `proxy_pass` a `master`, cerrar puertos directos y revisar logs (checkpoint CP-P4, RNF-3/RNF-9).
+- **Resumen técnico:**
+  - **Nginx instalado en el host EC2** (por `apt`, systemd `active`) y configurado con el server block de `persito.online` + `www` → **`proxy_pass http://127.0.0.1:3000`**.
+  - Configuración **versionada en `infra/nginx/energyshark.conf`** (regla del plan maestro), copiada a `/etc/nginx/sites-available/` + symlink en `sites-enabled`; se deshabilitó el `default`.
+  - Cabeceras de proxy completas (`Host`, `X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto`).
+  - **Puerto 3000 no expuesto**: el `master` publica solo en `127.0.0.1` y el SG solo abre 22/80/443.
+- **Verificación (evidencia real desde el exterior):**
+  ```text
+  $ curl http://persito.online/health
+  {"status":"ok","db":"up"}
+  $ curl "http://persito.online/history?limit=2"
+  {"items":[...],"meta":{"page":1,"limit":2,"total":2166,"totalPages":1083}}
+  # 2166 eventos reales del curso persistidos en RDS; validUntil poblado desde packageBody
+  $ curl http://3.216.254.80:3000/health   # sin respuesta (puerto cerrado)
+  ```
+- **Problemas encontrados y solución:** Sin bloqueos; se usó `sites-available`/`sites-enabled` y se removió el `default` para que `persito.online` sea el único server block.
+- **Comandos importantes:**
+  ```bash
+  sudo apt install -y nginx && sudo systemctl enable --now nginx
+  sudo cp infra/nginx/energyshark.conf /etc/nginx/sites-available/energyshark
+  sudo ln -sf /etc/nginx/sites-available/energyshark /etc/nginx/sites-enabled/energyshark
+  sudo rm -f /etc/nginx/sites-enabled/default
+  sudo nginx -t && sudo systemctl reload nginx
+  sudo tail -f /var/log/nginx/access.log
+  ```
+- **Resultado de pruebas:** API accesible por `http://persito.online` (health y history con eventos reales); puerto 3000 no accesible desde el exterior. **CP-P4 alcanzado**; RNF-3/RNF-9 verificados.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-10-cierre-auditoria.md`
+- **Estado:** Verificado en producción (checkpoint CP-P4 alcanzado)
