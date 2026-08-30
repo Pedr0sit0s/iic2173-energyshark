@@ -20,7 +20,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 11 — HTTPS con Let's Encrypt | Verificado en producción (CP-P5) |
 | 12 — Resiliencia y health checks | Verificado en producción (CP-P6) |
 | 13 — Trazabilidad y auditoría | Completado (CP-L7) |
-| 14–15 | Pendientes |
+| 14 — Documentación de IA y bitácora | Completado (DOC-1) |
+| 15 — Entrega final | Completado (CP-P7) |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -107,7 +108,50 @@ flowchart LR
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
-## Documentación
+## Entrega (E0 · IIC2173 · EnergyShark)
+
+**Dominio:** https://persito.online
+
+**Acceso SSH:**
+
+```bash
+ssh -i ~/.ssh/energyshark.pem energyshark@3.216.254.80
+```
+
+> El archivo `.pem` se entrega por el **buzón de Canvas** y **no** está en este repositorio (verificado con `git ls-files`).
+
+**Consideraciones generales:**
+
+- Stack: TypeScript · NestJS · TypeORM · amqplib · PostgreSQL · Docker · Nginx · AWS (EC2 + RDS).
+- Arquitectura: `connector` (consumidor AMQP + reenvío HTTP) y `master` (API REST + persistencia), desplegados con Docker Compose en una EC2 Free Tier y PostgreSQL en RDS.
+- Exposición pública: Nginx en el host (reverse proxy) + HTTPS con Let's Encrypt (renovación automática 2×/día).
+- Broker del curso: consumido por `connector` desde `observer.45.q` (AMQPS/TLS).
+
+**Puntos logrados / no logrados:**
+
+| Ámbito | Aspecto | Estado |
+| --- | --- | --- |
+| Parte mínima | RF1 — Historial de demanda en la API | Logrado (producción) |
+| Parte mínima | RF2 — Detalle `/history/:id` | Logrado (producción) |
+| Parte mínima | RF3 — Paginación (default 25) | Logrado (producción) |
+| Parte mínima | RF4 — Filtros (incl. `receivedAt` y fechas) | Logrado (producción) |
+| Parte mínima | RNF1 — `connector` AMQP + reconexión + master sin broker | Logrado (producción) |
+| Parte mínima | RNF2 — Containerizado, `master` recibe de `connector` | Logrado (producción) |
+| Parte mínima | RNF3 — Proxy inverso Nginx en el host | Logrado (producción) |
+| Parte mínima | RNF4 — Dominio público | Logrado (producción) |
+| Parte mínima | RNF5 — EC2 Free Tier | Logrado (producción) |
+| Parte mínima | RNF6 — PostgreSQL externo (RDS) | Logrado (producción) |
+| Parte mínima | RNF7 — HEALTHCHECK por contenedor | Logrado (producción) |
+| Docker-Compose | RNF1 — `master` desde Compose | Logrado |
+| Docker-Compose | RNF2 — DB integrada desde Compose | Logrado |
+| Docker-Compose | RNF3 — `connector` desde Compose + red con la app | Logrado |
+| Variable elegida | HTTPS — SSL Let's Encrypt | Logrado |
+| Variable elegida | HTTPS — Redirección HTTP→HTTPS | Logrado |
+| Variable elegida | HTTPS — Renovación automática (≥ 2×/día) | Logrado |
+| — | Documentación de IA (`ai_docs/prompts`) | Logrado (DOC-1) |
+| — | README de entrega | Logrado (DOC-2) |
+
+**Documentación
 
 - **Etapas y avance:** [`etapas/README.md`](etapas/README.md)
 - **Bitácora técnica:** [`docs/bitacora.md`](docs/bitacora.md)
