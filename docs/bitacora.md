@@ -40,6 +40,8 @@
 | 16 | 2026-08-30 | Etapa 7 — Infraestructura AWS: EC2 + RDS (ejecución y cierre) |
 | 17 | 2026-08-30 | Etapa 8 — Primer despliegue en producción (planificación e inicio) |
 | 18 | 2026-08-30 | Etapa 8 — Primer despliegue en producción (ejecución y cierre) |
+| 19 | 2026-08-30 | Etapa 9 — Dominio y DNS (planificación e inicio) |
+| 20 | 2026-08-30 | Etapa 9 — Dominio y DNS (ejecución y cierre) |
 
 ---
 
@@ -535,5 +537,43 @@ git branch -M main
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-08-cierre-auditoria.md`
 - **Estado:** Verificado en producción (checkpoint CP-P2 alcanzado)
 
+---
 
+## Entrada 19 — Etapa 9 — Dominio y DNS (planificación e inicio)
 
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 9 según el Plan Maestro: generar el plan detallado `etapas/etapa-09-dominio-dns.md` y dejar lista la hoja de ruta para apuntar el dominio a la EC2 (checkpoint CP-P3, RNF-4).
+- **Decisiones técnicas:**
+  - Dominio `persito.online` (registrado en Namecheap, bitácora Entrada 3) apuntando a la Elastic IP `3.216.254.80`.
+  - **Registro A** en el apex (`@` → `3.216.254.80`) y `www` como CNAME al apex.
+  - **Fuente de DNS única** (Namecheap BasicDNS o el cPanel del hosting en `server352.web-hosting.com`); se decide en la ejecución según los nameservers actuales.
+  - **TTL bajo (300 s)** durante la configuración para acelerar la propagación.
+  - Verificación con `dig`/`nslookup` y verificadores online (`dnschecker.org`, `whatsmydns.net`).
+- **Problemas encontrados y solución:** El dominio ya tiene un hosting con cPanel (bitácora Entrada 3): hay que confirmar dónde se administra el DNS para no crear registros en dos fuentes (conflicto). Pendiente de resolver en la ejecución.
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-09-dominio-dns.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron el dominio, la Elastic IP y los datos de la bitácora.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-09-dominio-dns.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 9.1–9.3; checkpoint CP-P3)
+
+---
+
+## Entrada 20 — Etapa 9 — Dominio y DNS (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 9.1–9.3 de la Etapa 9: apuntar el dominio a la EC2 y verificar la propagación (checkpoint CP-P3, RNF-4).
+- **Resumen técnico:**
+  - Dominio `persito.online` **activo**; fuente única de DNS elegida: **Namecheap BasicDNS** (NS `dns1/dns2.registrar-servers.com`).
+  - **Registro A** del apex `@` → `3.216.254.80` y **`www`** como CNAME → `persito.online`.
+- **Verificación (evidencia real):**
+  ```text
+  $ dig +short persito.online @8.8.8.8
+  3.216.254.80
+  $ dig +short www.persito.online @8.8.8.8
+  persito.online.
+  3.216.254.80
+  ```
+- **Problemas encontrados y solución:** El dominio ya tenía hosting con cPanel; se resolvió usando **una sola fuente de DNS** (Namecheap BasicDNS) para evitar registros duplicados/conflictivos.
+- **Comandos importantes:** `dig +short persito.online`, `dig +short www.persito.online`, `dig +short NS persito.online`.
+- **Resultado de pruebas:** apex y `www` resuelven a `3.216.254.80` desde el resolver de Google y el local. **CP-P3 alcanzado**; RNF-4 verificado.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-09-cierre-auditoria.md`
+- **Estado:** Verificado en producción (checkpoint CP-P3 alcanzado)
