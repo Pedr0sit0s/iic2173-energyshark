@@ -48,7 +48,7 @@
 | 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Verificado en producción |
 | 8 | `etapa-08-primer-despliegue.md` | Primer despliegue funcional en EC2 (MVP en producción) | Verificado en producción |
 | 9 | `etapa-09-dominio-dns.md` | Dominio Namecheap, registro A y propagación DNS | Verificado en producción |
-| 10 | `etapa-10-nginx-reverse-proxy.md` | Nginx en el host EC2 como reverse proxy | Pendiente |
+| 10 | `etapa-10-nginx-reverse-proxy.md` | Nginx en el host EC2 como reverse proxy | Verificado en producción |
 | 11 | `etapa-11-https-letsencrypt.md` | HTTPS con Let's Encrypt + renovación automática | Pendiente |
 | 12 | `etapa-12-resiliencia-healthchecks.md` | Pruebas de resiliencia y validación de health checks | Pendiente |
 | 13 | `etapa-13-trazabilidad-auditoria.md` | Trazabilidad de requisitos y auditoría contra el enunciado | Pendiente |
@@ -61,4 +61,4 @@ La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3�
 
 ## Siguiente etapa recomendada
 
-**Etapa 10** (`etapa-10-nginx-reverse-proxy.md`) — Nginx como reverse proxy (en el host): instalar Nginx en la EC2 (no en contenedor), server block HTTP con `server_name persito.online` y `proxy_pass` a `127.0.0.1:3000`, cerrar puertos directos vía Security Groups y revisar logs (checkpoint CP-P4).
+**Etapa 11** (`etapa-11-https-letsencrypt.md`) — HTTPS con Let's Encrypt: instalar Certbot (plugin Nginx), emitir el certificado para `persito.online`, server block 443 con redirección HTTP→HTTPS y renovación automática (≥ 2×/día) (checkpoint CP-P5).

@@ -242,7 +242,7 @@ Notas:
 | RNF-6 | Docker Compose (master + connector + postgres local) | 6 | Verificado localmente |
 | RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | 7, 8 | Verificado en producción |
 | RNF-8 | Dominio público y DNS hacia EC2 | 9 | Verificado en producción |
-| RNF-9 | Nginx reverse proxy instalado en el host | 10 | Pendiente |
+| RNF-9 | Nginx reverse proxy instalado en el host | 10 | Verificado en producción |
 | RNF-10 | HTTPS con Let's Encrypt + renovación automática (≥ 2×/día) | 11 | Pendiente |
 | DOC-1 | Documentación de uso de IA (`ai_docs/prompts`) | 1, 14 | Pendiente |
 | DOC-2 | README completo y requisitos logrados/no logrados | 15 | Pendiente |
