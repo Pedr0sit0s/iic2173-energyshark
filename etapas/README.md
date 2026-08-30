@@ -52,13 +52,13 @@
 | 11 | `etapa-11-https-letsencrypt.md` | HTTPS con Let's Encrypt + renovación automática | Verificado en producción |
 | 12 | `etapa-12-resiliencia-healthchecks.md` | Pruebas de resiliencia y validación de health checks | Verificado en producción |
 | 13 | `etapa-13-trazabilidad-auditoria.md` | Trazabilidad de requisitos y auditoría contra el enunciado | Completado |
-| 14 | `etapa-14-documentacion-ia-bitacora.md` | Documentación de uso de IA y bitácora técnica | Pendiente |
-| 15 | `etapa-15-entrega-final.md` | Preparación de la entrega final | Pendiente |
+| 14 | `etapa-14-documentacion-ia-bitacora.md` | Documentación de uso de IA y bitácora técnica | Completado |
+| 15 | `etapa-15-entrega-final.md` | Preparación de la entrega final | Completado |
 
 ## Nota de numeración
 
-La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3–6 están **Verificadas localmente** (checkpoints CP-L3 a CP-L6): el PoC consume y se reconecta, `master` persiste/consulta eventos, el `connector` reenvía a `master` y se reconecta, y el sistema completo corre en contenedores Docker con health checks.
+**El roadmap completo (Etapas 0–15) está cerrado.** El sistema EnergyShark está en producción: `master` + `connector` en Docker (EC2 Free Tier), PostgreSQL en RDS, dominio `persito.online` con Nginx y HTTPS (Let's Encrypt, renovación automática), resiliencia verificada, trazabilidad auditada y registro de IA completo (DOC-1). Entrega final lista (`v1.0`).
 
 ## Siguiente etapa recomendada
 
-**Etapa 14** (`etapa-14-documentacion-ia-bitacora.md`) — Documentación de uso de IA y bitácora: registro final en `ai_docs/prompts`, bitácora técnica completa y verificación del registro de IA (cierra DOC-1 y consolida CP-L7).
+**Roadmap completo**: todas las etapas (0–15) están cerradas. La entrega final está lista (`v1.0`): README de entrega (DOC-2), registro de IA completo (DOC-1), accesos preparados para Canvas y verificación end-to-end en producción (CP-P7).
