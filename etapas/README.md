@@ -42,7 +42,7 @@
 | 1 | `etapa-01-preparacion-entorno.md` | Preparación del entorno local, cuentas y repositorio | En progreso |
 | 2 | `etapa-02-diseno-arquitectura.md` | Fundamentos teóricos y diseño de la arquitectura | Completado |
 | 3 | `etapa-03-poc-rabbitmq.md` | Prueba de concepto: conexión, consumo y reconexión AMQP | Verificado localmente |
-| 4 | `etapa-04-master-api-local.md` | Servicio `master`: API REST + persistencia local (RF1–RF4) | Pendiente |
+| 4 | `etapa-04-master-api-local.md` | Servicio `master`: API REST + persistencia local (RF1–RF4) | Verificado localmente |
 | 5 | `etapa-05-connector-local.md` | Servicio `connector`: consumo AMQP + reenvío HTTP | Pendiente |
 | 6 | `etapa-06-docker-compose.md` | Dockerización de ambos servicios + Compose + health checks | Pendiente |
 | 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Pendiente |
@@ -61,4 +61,4 @@ La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. La Etapa 3 (P
 
 ## Siguiente etapa recomendada
 
-**Etapa 4** (`etapa-04-master-api-local.md`) — Servicio `master`: scaffold NestJS, PostgreSQL local en Docker, entidad/migraciones de `history`, `POST /events` y endpoints de consulta (RF1–RF4). La estructura real del evento observado en el PoC alimenta el modelo de datos.
+**Etapa 4** (`etapa-04-master-api-local.md`) — **Verificada localmente** (checkpoint CP-L4): `master` corre en local contra PostgreSQL, `POST /events` persiste con `receivedAt` en UTC, `GET /history` pagina y filtra (`type`, fechas, `city`), `GET /history/:id` devuelve detalle con 404, y `GET /health` chequea la DB (RF1–RF4, RNF-4 verificados). Próxima etapa: **Etapa 5 — Servicio `connector`** (consumo AMQP + reenvío HTTP) para cerrar el flujo end-to-end local.

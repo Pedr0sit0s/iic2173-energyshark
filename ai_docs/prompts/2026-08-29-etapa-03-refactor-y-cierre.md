@@ -1,6 +1,6 @@
 # Registro de IA — 2026-08-29 — Etapa 3: refactor del PoC, revisión de bitácora y versionado
 
-- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-pro
+- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-flash
 - **Fecha y hora:** 2026-08-29 (sexta sesión de trabajo)
 - **Contexto:** El usuario finalizó la ejecución de la Etapa 3 (PoC RabbitMQ) y solicitó pulir el código, actualizar la documentación y versionar los cambios.
 

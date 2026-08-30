@@ -1,6 +1,6 @@
 # Registro de IA — 2026-08-23 — Desarrollo de la Etapa 2 (diseño de arquitectura)
 
-- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-pro
+- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-flash
 - **Fecha y hora:** 2026-08-23 (cuarta sesión de trabajo)
 - **Contexto:** El usuario completó la Etapa 1 y solicitó avanzar a la Etapa 2 del Plan Maestro.
 

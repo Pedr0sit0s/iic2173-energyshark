@@ -16,7 +16,7 @@ ai_docs/
 ```markdown
 # Registro de IA — <fecha> — <tema>
 
-- **Herramienta:** (ej. opencode CLI · modelo deepseek-v4-pro)
+- **Herramienta:** (ej. opencode CLI · modelo deepseek-v4-flash)
 - **Fecha y hora:** 
 - **Contexto:** (etapa del proyecto en la que se usó)
 - **Prompt:** (texto o resumen fiel del prompt enviado)
@@ -35,3 +35,6 @@ ai_docs/
 | 2026-08-23 | `prompts/2026-08-23-etapa-02-diseno-arquitectura.md` | Desarrollo de la Etapa 2 (diseño de arquitectura) |
 | 2026-08-26 | `prompts/2026-08-26-etapa-03-poc-rabbitmq.md` | Inicio de la Etapa 3 (PoC RabbitMQ) |
 | 2026-08-29 | `prompts/2026-08-29-etapa-03-refactor-y-cierre.md` | Etapa 3: refactor del PoC, revisión de bitácora y versionado |
+| 2026-08-29 | `prompts/2026-08-29-etapa-04-master-local.md` | Inicio de la Etapa 4 (servicio `master` local) |
+| 2026-08-29 | `prompts/2026-08-29-etapa-04-ejecucion-cierre.md` | Etapa 4: ejecución (endpoints RF1–RF4) y cierre |
+| 2026-08-29 | `prompts/2026-08-29-etapa-04-revision-commits.md` | Etapa 4: revisión, correcciones, bitácora y reescritura de commits |

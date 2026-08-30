@@ -1,6 +1,6 @@
 # Registro de IA — 2026-08-23 — Plan Maestro y estructura de documentación
 
-- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-pro
+- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-flash
 - **Fecha y hora:** 2026-08-23 (sesión inicial del proyecto)
 - **Contexto:** Inicio del proyecto IIC2173 — Entrega 0. Sin código ni infraestructura previos.
 

@@ -1,6 +1,6 @@
 # Registro de IA — 2026-08-23 — Desarrollo de la Etapa 1
 
-- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-pro
+- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-flash
 - **Fecha y hora:** 2026-08-23 (segunda sesión de trabajo)
 - **Contexto:** Ejecución de la Etapa 1 del Plan Maestro (preparación del entorno local).
 

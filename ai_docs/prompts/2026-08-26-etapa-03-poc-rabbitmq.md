@@ -1,6 +1,6 @@
 # Registro de IA — 2026-08-26 — Inicio de la Etapa 3 (PoC RabbitMQ)
 
-- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-pro
+- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-flash
 - **Fecha y hora:** 2026-08-26 (quinta sesión de trabajo)
 - **Contexto:** El usuario perdió el historial de la sesión anterior. El estado del proyecto se reconstruyó desde los archivos del repositorio (`etapas/etapa-00-plan-maestro.md` como base). La Etapa 2 quedó finalizada al 100%. Se solicita iniciar la Etapa 3 siguiendo el flujo de documentación establecido.
 

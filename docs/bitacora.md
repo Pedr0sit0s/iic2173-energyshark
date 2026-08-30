@@ -30,6 +30,8 @@
 | 6 | 2026-08-26 | Cierre de la Etapa 2 |
 | 7 | 2026-08-26 | Etapa 3 — PoC RabbitMQ (planificación e inicio) |
 | 8 | 2026-08-29 | Etapa 3 — PoC RabbitMQ (ejecución, refactor y cierre) |
+| 9 | 2026-08-29 | Etapa 4 — Servicio `master` local (planificación e inicio) |
+| 10 | 2026-08-29 | Etapa 4 — Servicio `master` local (ejecución y cierre) |
 
 ---
 
@@ -229,3 +231,72 @@ git branch -M main
   - `npm run typecheck` sin errores; el guard de configuración falla de forma controlada si faltan variables de entorno.
 - **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-03-refactor-y-cierre.md`
 - **Estado:** Verificado localmente (checkpoint CP-L3 alcanzado)
+
+---
+
+## Entrada 9 — Etapa 4 — Servicio `master` local (planificación e inicio)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Iniciar la Etapa 4 según el Plan Maestro: generar el plan detallado `etapas/etapa-04-master-api-local.md` y dejar lista la hoja de ruta para construir el servicio `master` en local (checkpoint CP-L4, RF1–RF4).
+- **Decisiones técnicas:**
+  - Scaffold NestJS en `apps/master` con `@nestjs/cli` (`--skip-git`, el monorepo ya es el repo).
+  - ORM TypeORM con **migraciones desde el inicio** (DataSource para CLI); `synchronize` nunca en producción.
+  - `id` propio generado en app (`crypto.randomUUID()`/`@PrimaryGeneratedColumn('uuid')`); `receivedAt` asignado por `master` en UTC.
+  - `ValidationPipe` global con `class-validator` para errores 400 automáticos; QueryBuilder para filtros dinámicos (RF4).
+  - PostgreSQL de desarrollo en contenedor `postgres:16` con volumen (`energy_postgres`).
+  - Filtro `city` sobre `packageBody` JSONB (operador `->>`); duplicados por `idpk` se toleran en esta etapa (at-least-once).
+  - `GET /health` con chequeo real de DB (`SELECT 1`), preparando RNF-5 y la Etapa 6.
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental; la ejecución de la etapa queda pendiente).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-04-master-api-local.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; la estructura real del evento de la Etapa 3 (`idpk`, `type`, `packageBody.validUntil`) se incorporó al DTO y a los casos de prueba.
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-04-master-local.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 4.1–4.6; checkpoint CP-L4)
+
+---
+
+## Entrada 10 — Etapa 4 — Servicio `master` local (ejecución y cierre)
+
+- **Fecha:** 2026-08-29
+- **Objetivo:** Ejecutar las sub-etapas 4.3–4.6 de la Etapa 4: persistencia (`history`), `POST /events`, endpoints de consulta y `GET /health`, alcanzando el checkpoint CP-L4 (RF1–RF4 verificados localmente). Elevar la calidad del código de configuración, entidad y módulos a un estándar profesional.
+- **Decisiones técnicas:**
+  - **Configuración profesional**: variables de entorno validadas en arranque (`src/config/env.validation.ts`, `class-validator` + `validateSync`, conversión de `PORT`/`DB_PORT` a `number`, fail-fast con mensajes claros); `.env` resuelto desde `__dirname` (raíz del repo) en `ConfigModule` y en el DataSource de CLI; `ssl` configurable para RDS y `retryAttempts`/`retryDelay` en la conexión.
+  - **Entidad `History`**: `packageBody` tipado como `Record<string, unknown>` (ya no `any`), índices con nombre explícito (`IDX_history_type/received_at/valid_until`), comentarios de columna en el esquema.
+  - **Módulos por feature**: `HistoryModule` (controller + service + repository) y `HealthModule`, eliminando `forFeature` del `AppModule`.
+  - **Validación estricta**: `@IsUUID()` de `validator.js` 13.15 valida también los *variant bits* de RFC 4122; `ParseUUIDPipe` en `:id`; `page`/`limit` con default 25 y tope 100.
+  - **Filtro `city`** sobre `packageBody` JSONB con quoting explícito de la columna (`"h"."packageBody"->>'city'`), porque TypeORM 1.x no re-escribe la expresión JSONB y PostgreSQL dobla a minúsculas los identificadores sin comillas.
+- **Problemas encontrados y solución:**
+  - **Glob de migraciones roto** (`*.{.ts,.js}` → no matcheaba ningún archivo): corregido a `*{.ts,.js}`; `migration:run` decía "No migrations are pending" con la tabla vacía.
+  - **`envFilePath` y `dotenv` apuntaban a `apps/`** en vez de la raíz del repo: corregido con `join(__dirname, '..', '..', '..', '.env')`.
+  - **Migración duplicada** (`InitHistory` con dos timestamps): eliminado el archivo más antiguo (`1788050673050`), se conservó el vigente.
+  - **500 en el filtro `city`**: TypeORM dejaba `h.packageBody->>'city'` sin comillas → columna `packagebody` no existe; fix con `"h"."packageBody"->>'city'`.
+  - **UUIDs de prueba rechazados** por `validator.js` (variant bits RFC 4122): los eventos de prueba se generaron con `crypto.randomUUID()` (el evento real del curso `2a68a81d-...` pasó sin problema).
+  - **Revisión post-entrega (2026-08-29)**: `main.ts` escuchaba en un puerto hardcodeado (3000) ignorando `PORT`; se corrigió para leerlo de la configuración y se quitó el emoji del log. La migración `InitHistory` usaba `uuid_generate_v4()` sin garantizar la extensión → se agregó `CREATE EXTENSION IF NOT EXISTS "pgcrypto"` para que la tabla no dependa de una extensión preinstalada. Se removieron residuos del scaffold en `package.json` (`@nestjs/observe`, `@nestjs/mau`, script `deploy`), se declaró `dotenv` explícitamente, se agregaron los scripts `migration:generate/run/revert`, se reemplazó el README por defecto por uno propio del servicio y se eliminó `apps/master/.gitkeep`.
+  - **Lint y tests**: `oxlint` queda funcional (sin errores en `npm run lint`). `jest` sigue pendiente: los paquetes de NestJS 12 (`@nestjs/common`, `@nestjs/testing`) son ESM-only y `jest-runtime` no puede `require()`los desde tests CJS, aunque la app corre porque Node 24 resuelve `require(esm)` nativamente. La corrección de tests (modo ESM de jest o transpilación de `@nestjs/*`) queda diferida y no bloquea la etapa.
+- **Comandos importantes:**
+  ```bash
+  npx typeorm-ts-node-commonjs migration:generate src/migrations/InitHistory -d src/data-source.ts
+  npx typeorm-ts-node-commonjs migration:run -d src/data-source.ts
+  npm run build && npm run start:prod
+  curl -X POST http://localhost:3000/events -H 'Content-Type: application/json' -d '{...}'
+  curl "http://localhost:3000/history?page=2&limit=2&type=demand-set&city=Santiago"
+  ```
+- **Resultado de pruebas:** evidencia completa en `/tmp/etapa4-pruebas.txt` (12 pruebas T1–T12):
+
+  | # | Prueba | Resultado |
+  | --- | --- | --- |
+  | T1 | `POST /events` (evento real Etapa 3) | 201 + registro con `id` propio y `receivedAt` UTC |
+  | T2 | `POST /events` sin `idpk` | 400 (validation) |
+  | T3 | `GET /health` | 200 `{ status: 'ok', db: 'up' }` (SELECT 1) |
+  | T4 | `GET /history` | 200 `{ items, meta }`, default 25, ordenado por `receivedAt` DESC |
+  | T5 | `GET /history?page=2&limit=2` | Segundo bloque de 2; `meta: { total: 6, totalPages: 3 }` |
+  | T6 | `GET /history?type=demand-set` | Solo eventos `demand-set` |
+  | T7 | `GET /history?city=Santiago` | Filtro JSONB: solo eventos con `packageBody.city = Santiago` |
+  | T8 | `GET /history?receivedAtFrom=...&receivedAtTo=...` | Solo eventos en el rango |
+  | T9 | `GET /history/:id` | 200 con el detalle completo |
+  | T10 | `GET /history/:id` inexistente | 404 |
+  | T11 | `GET /history?limit=999` | 400 (tope 100) |
+  | T12 | `GET /history/abc` | 400 (UUID inválido) |
+
+  - **RF1** (lista) ✓ · **RF2** (detalle + 404) ✓ · **RF3** (paginación) ✓ · **RF4** (filtros) ✓ · **RNF-4** (master sin RabbitMQ) ✓ · **RNF-5 parcial** (`/health`) ✓.
+- **Registro de IA:** `ai_docs/prompts/2026-08-29-etapa-04-ejecucion-cierre.md`
+- **Estado:** Verificado localmente (checkpoint CP-L4 alcanzado)

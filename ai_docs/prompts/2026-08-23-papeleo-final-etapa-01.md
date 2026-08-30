@@ -1,6 +1,6 @@
 # Registro de IA — 2026-08-23 — Cierre documental de la Etapa 1
 
-- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-pro
+- **Herramienta:** opencode CLI (agente de asistencia técnica) · modelo deepseek-v4-flash
 - **Fecha y hora:** 2026-08-23 (tercera sesión de trabajo)
 - **Contexto:** El usuario ya ejecutó casi todos los pasos de la Etapa 1. Quedaba terminar el "papeleo" documental.
 
