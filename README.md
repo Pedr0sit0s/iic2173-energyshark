@@ -18,7 +18,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 9 — Dominio y DNS | Verificado en producción (CP-P3) |
 | 10 — Nginx reverse proxy | Verificado en producción (CP-P4) |
 | 11 — HTTPS con Let's Encrypt | Verificado en producción (CP-P5) |
-| 12–15 | Pendientes |
+| 12 — Resiliencia y health checks | Verificado en producción (CP-P6) |
+| 13–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
