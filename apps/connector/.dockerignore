@@ -1,0 +1,7 @@
+node_modules
+dist
+poc
+.env
+.env.*
+!.env.example
+*.tsbuildinfo

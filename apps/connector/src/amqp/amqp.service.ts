@@ -1,5 +1,6 @@
 import { Injectable, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { writeFileSync } from 'fs';
 import { connect, type Channel, type ChannelModel, type ConsumeMessage } from 'amqplib';
 import { computeBackoffDelay, type BackoffOptions } from './backoff';
 import { parseEnergyEvent, type EnergyEvent } from './energy-event';
@@ -11,6 +12,9 @@ const RECONNECT_BACKOFF: BackoffOptions = {
   capMs: 30_000,
   jitterMs: 1_000,
 };
+
+const HEARTBEAT_FILE = '/tmp/connector-heartbeat';
+const HEARTBEAT_INTERVAL_MS = 5_000;
 
 interface AmqpConnectionWithSocket {
   connection?: { stream?: { destroy(): void } };
@@ -31,6 +35,7 @@ export class AmqpService implements OnApplicationBootstrap, OnApplicationShutdow
   private connection: ChannelModel | null = null;
   private channel: Channel | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
+  private heartbeatTimer: NodeJS.Timeout | null = null;
   private reconnecting = false;
   private shuttingDown = false;
   private attempt = 0;
@@ -44,14 +49,41 @@ export class AmqpService implements OnApplicationBootstrap, OnApplicationShutdow
   }
 
   async onApplicationBootstrap(): Promise<void> {
+    this.startHeartbeat();
     await this.connect();
   }
 
   async onApplicationShutdown(): Promise<void> {
     this.shuttingDown = true;
     this.clearReconnectTimer();
+    this.stopHeartbeat();
     logger.info('Cerrando canal y conexión...');
     await this.close();
+  }
+
+  /**
+   * Latido del proceso para el HEALTHCHECK de Docker: escribe un archivo cada
+   * `HEARTBEAT_INTERVAL_MS`. Refleja que el proceso está vivo y activo (no la
+   * conexión, que puede estar en reconexión por diseño — RNF-3).
+   */
+  private startHeartbeat(): void {
+    if (this.heartbeatTimer) {
+      return;
+    }
+    this.heartbeatTimer = setInterval(() => {
+      try {
+        writeFileSync(HEARTBEAT_FILE, Date.now().toString());
+      } catch (error) {
+        logger.error(`No se pudo escribir el heartbeat: ${reasonOf(error)}`);
+      }
+    }, HEARTBEAT_INTERVAL_MS);
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
   }
 
   /** Modo caos: destruye el socket TCP para simular un corte de red (pruebas). */
