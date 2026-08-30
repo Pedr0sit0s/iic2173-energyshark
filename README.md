@@ -14,7 +14,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 5 — Servicio `connector` (local) | Verificado localmente (CP-L5) |
 | 6 — Dockerización + Docker Compose | Verificado localmente (CP-L6) |
 | 7 — Infraestructura AWS (EC2 + RDS) | Verificado en producción (CP-P1) |
-| 8–15 | Pendientes |
+| 8 — Primer despliegue en EC2 (MVP) | Verificado en producción (CP-P2) |
+| 9–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -83,17 +84,17 @@ flowchart LR
 
 | ID | Requisito | Estado |
 | --- | --- | --- |
-| RF1 | Historial de demanda eléctrica | Verificado localmente |
-| RF2 | Detalle de un registro (`/history/{id}`) | Verificado localmente |
-| RF3 | Paginación (default 25) | Verificado localmente |
-| RF4 | Filtros (incl. `receivedAt` y fechas) | Verificado localmente |
-| RNF-1 | Separación de servicios `connector`/`master` | Verificado localmente |
-| RNF-2 | `connector` → `master` vía HTTP POST | Verificado localmente |
-| RNF-3 | Reconexión automática a RabbitMQ | Verificado localmente |
-| RNF-4 | `master` operativo sin RabbitMQ/connector | Verificado localmente |
+| RF1 | Historial de demanda eléctrica | Verificado en producción |
+| RF2 | Detalle de un registro (`/history/{id}`) | Verificado en producción |
+| RF3 | Paginación (default 25) | Verificado en producción |
+| RF4 | Filtros (incl. `receivedAt` y fechas) | Verificado en producción |
+| RNF-1 | Separación de servicios `connector`/`master` | Verificado en producción |
+| RNF-2 | `connector` → `master` vía HTTP POST | Verificado en producción |
+| RNF-3 | Reconexión automática a RabbitMQ | Verificado en producción |
+| RNF-4 | `master` operativo sin RabbitMQ/connector | Verificado en producción |
 | RNF-5 | Dockerización + HEALTHCHECK por contenedor | Verificado localmente |
 | RNF-6 | Docker Compose (master + connector + postgres local) | Verificado localmente |
-| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | En progreso (infraestructura lista; despliegue en la Etapa 8) |
+| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | Verificado en producción |
 | RNF-8..10, DOC, ENT | Dominio, Nginx, HTTPS, entrega | Pendientes |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
