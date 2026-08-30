@@ -245,8 +245,8 @@ Notas:
 | RNF-9 | Nginx reverse proxy instalado en el host | 10 | Verificado en producción | `etapas/etapa-10-nginx-reverse-proxy.md`; `infra/nginx/energyshark.conf`; `curl https://persito.online/health`; bitácora Entrada 22 |
 | RNF-10 | HTTPS con Let's Encrypt + renovación automática (≥ 2×/día) | 11 | Verificado en producción | `etapas/etapa-11-https-letsencrypt.md`; `certbot certificates` y renovación en systemd timer; bitácora Entrada 24 |
 | DOC-1 | Documentación de uso de IA (`ai_docs/prompts`) | 1, 14 | Verificado localmente | `ai_docs/README.md` (índice) y `ai_docs/prompts/` (registro por etapa/iteración) |
-| DOC-2 | README completo y requisitos logrados/no logrados | 15 | Pendiente | Etapa 15 (entrega final) |
-| ENT-1 | Accesos para Canvas + `.pem` entregado, NO en GitHub | 15 | Pendiente | Etapa 15 (entrega final) |
+| DOC-2 | README completo y requisitos logrados/no logrados | 15 | Completado | `README.md` (sección "Entrega") |
+| ENT-1 | Accesos para Canvas + `.pem` entregado, NO en GitHub | 15 | Completado | `git ls-files \| grep -i pem` vacío; accesos en el README de entrega |
 
 **Estados posibles:** `Pendiente` · `En progreso` · `Verificado localmente` · `Verificado en producción` · `Completado`
 
