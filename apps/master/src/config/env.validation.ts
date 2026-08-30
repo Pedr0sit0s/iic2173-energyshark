@@ -20,10 +20,11 @@ class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment;
 
+  @IsOptional()
   @IsInt()
   @Min(1)
   @Max(65535)
-  PORT: number;
+  PORT?: number = 3000;
 
   @IsString()
   @MinLength(1)
