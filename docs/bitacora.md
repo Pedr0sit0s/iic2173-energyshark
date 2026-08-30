@@ -38,6 +38,8 @@
 | 14 | 2026-08-29 | Etapa 6 — Dockerización y Docker Compose (ejecución y cierre) |
 | 15 | 2026-08-30 | Etapa 7 — Infraestructura AWS: EC2 + RDS (planificación e inicio) |
 | 16 | 2026-08-30 | Etapa 7 — Infraestructura AWS: EC2 + RDS (ejecución y cierre) |
+| 17 | 2026-08-30 | Etapa 8 — Primer despliegue en producción (planificación e inicio) |
+| 18 | 2026-08-30 | Etapa 8 — Primer despliegue en producción (ejecución y cierre) |
 
 ---
 
@@ -486,6 +488,52 @@ git branch -M main
 - **Resultado de pruebas:** EC2 `running` con IP pública fija; SGs `energyshark-ec2` y `energyshark-rds` creados; RDS `available` con endpoint interno (5432 solo desde la EC2); Docker Engine + Compose instalados en la EC2. **CP-P1 alcanzado.**
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-07-cierre-auditoria.md`
 - **Estado:** Verificado en producción (checkpoint CP-P1 alcanzado)
+
+---
+
+## Entrada 17 — Etapa 8 — Primer despliegue en producción (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 8 según el Plan Maestro: generar el plan detallado `etapas/etapa-08-primer-despliegue.md` y dejar lista la hoja de ruta para desplegar el MVP en la EC2 conectado a RDS (checkpoint CP-P2, RF1–RF4 y RNF-7 en producción).
+- **Decisiones técnicas:**
+  - **`compose.prod.yaml` separado** (sin `postgres`): `master` + `connector` conectados a RDS; deja intacto el `compose.yaml` de desarrollo.
+  - `master` apunta a RDS (`DB_HOST=<endpoint>`, `DB_SSL=true`) y publica **solo `127.0.0.1:3000`** (Nginx lo alcanzará en la Etapa 10; el SG no abre 3000).
+  - Migraciones contra RDS con `migration:run:prod` en el arranque de `master` (patrón de la Etapa 6).
+  - Build en la EC2 (`docker compose build`, sin registry); `.env` de producción en el host (`~/iic2173-energyshark/.env`, no versionado).
+  - `restart: unless-stopped`; rollback por `git checkout <commit>` + rebuild (la data vive en RDS).
+  - Verificación end-to-end por `curl 127.0.0.1:3000` desde la EC2 (sin exponer el puerto al mundo).
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental). Pendiente para la ejecución: construir las imágenes en `t2.micro` (1 GB de RAM) de a una para no quedarse sin memoria.
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-08-primer-despliegue.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones; se incorporaron los recursos de la Etapa 7 (EC2 `i-001abcc637483ce58`, IP `3.216.254.80`, RDS endpoint) y las decisiones de las Etapas 4–6 (migraciones, health checks, `MASTER_URL`).
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-08-primer-despliegue.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 8.1–8.4; checkpoint CP-P2)
+
+---
+
+## Entrada 18 — Etapa 8 — Primer despliegue en producción (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 8.1–8.4 de la Etapa 8: desplegar el MVP en la EC2 conectado a RDS y verificar el flujo end-to-end en producción (checkpoint CP-P2, RF1–RF4 y RNF-7).
+- **Logros y cambios implementados:**
+  - **`compose.prod.yaml`** (nuevo): `master` + `connector` sin `postgres`. `master` apunta a RDS (`DB_HOST` interpolado, `DB_SSL=true`) y publica **solo `127.0.0.1:3000`**; `connector` usa `MASTER_URL=http://master:3000`; ambos con `restart: unless-stopped` y HEALTHCHECK. Migraciones contra RDS con `migration:run:prod` en el arranque de `master`.
+  - **Fix `PORT` opcional**: `env.validation.ts` ahora permite `PORT` con default `3000` (antes `getOrThrow` rompía el arranque si la variable no venía definida).
+  - Repo clonado en la EC2 (`~/iic2173-energyshark`) con `.env` de producción en el host (no versionado).
+  - Verificación end-to-end en producción: `GET /health` → `{ status: ok, db: up }`, `GET /history` con eventos reales del curso persistidos en RDS y resiliencia ante `restart` de `master`/`connector`.
+- **Problemas encontrados y solución:**
+  - Arranque fallaba si `PORT` no estaba definido → se hizo `PORT` opcional con default 3000 (commit `5bf3fa7`).
+  - Build en `t2.micro` (1 GB RAM): se construyó de a una imagen para no agotar memoria.
+- **Comandos importantes:**
+  ```bash
+  ssh -i ~/.ssh/energyshark.pem energyshark@3.216.254.80
+  cd ~/iic2173-energyshark
+  docker compose -f compose.prod.yaml build
+  docker compose -f compose.prod.yaml up -d
+  docker compose -f compose.prod.yaml ps
+  curl -s http://127.0.0.1:3000/health
+  ```
+- **Resultado de pruebas:** MVP funcionando en AWS: `master` + `connector` `healthy`, migraciones aplicadas a RDS, eventos reales del curso persistidos y consultables, y recuperación automática ante reinicios. **CP-P2 alcanzado**; RF1–RF4 y RNF-7 verificados en producción.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-08-cierre-auditoria.md`
+- **Estado:** Verificado en producción (checkpoint CP-P2 alcanzado)
 
 
 
