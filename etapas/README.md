@@ -43,7 +43,7 @@
 | 2 | `etapa-02-diseno-arquitectura.md` | Fundamentos teóricos y diseño de la arquitectura | Completado |
 | 3 | `etapa-03-poc-rabbitmq.md` | Prueba de concepto: conexión, consumo y reconexión AMQP | Verificado localmente |
 | 4 | `etapa-04-master-api-local.md` | Servicio `master`: API REST + persistencia local (RF1–RF4) | Verificado localmente |
-| 5 | `etapa-05-connector-local.md` | Servicio `connector`: consumo AMQP + reenvío HTTP | Pendiente |
+| 5 | `etapa-05-connector-local.md` | Servicio `connector`: consumo AMQP + reenvío HTTP | Verificado localmente |
 | 6 | `etapa-06-docker-compose.md` | Dockerización de ambos servicios + Compose + health checks | Pendiente |
 | 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Pendiente |
 | 8 | `etapa-08-primer-despliegue.md` | Primer despliegue funcional en EC2 (MVP en producción) | Pendiente |
@@ -57,8 +57,8 @@
 
 ## Nota de numeración
 
-La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. La Etapa 3 (PoC RabbitMQ) está **Verificada localmente** (checkpoint CP-L3): la cola asignada quedó confirmada (`observer.45.q`), el PoC consume eventos reales y se reconecta automáticamente ante caídas del broker.
+La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3 (PoC RabbitMQ), 4 (`master` local) y 5 (`connector` local) están **Verificadas localmente** (checkpoints CP-L3, CP-L4 y CP-L5): el PoC consume y se reconecta, `master` persiste/consulta eventos, y el `connector` consume `observer.45.q`, reenvía a `master` y se reconecta ante caídas del broker.
 
 ## Siguiente etapa recomendada
 
-**Etapa 4** (`etapa-04-master-api-local.md`) — **Verificada localmente** (checkpoint CP-L4): `master` corre en local contra PostgreSQL, `POST /events` persiste con `receivedAt` en UTC, `GET /history` pagina y filtra (`type`, fechas, `city`), `GET /history/:id` devuelve detalle con 404, y `GET /health` chequea la DB (RF1–RF4, RNF-4 verificados). Próxima etapa: **Etapa 5 — Servicio `connector`** (consumo AMQP + reenvío HTTP) para cerrar el flujo end-to-end local.
+**Etapa 5** (`etapa-05-connector-local.md`) — **Verificada localmente** (checkpoint CP-L5): `connector` NestJS standalone consume la cola del curso, reenvía cada evento a `POST /events` con timeout, reintentos y ack solo tras 2xx, y se reconecta con backoff ante cortes (RNF-1, RNF-2, RNF-3). El flujo RabbitMQ → connector → master → DB quedó verificado con eventos reales. Próxima etapa: **Etapa 6 — Dockerización** (Dockerfiles multi-stage + Docker Compose + HEALTHCHECK).

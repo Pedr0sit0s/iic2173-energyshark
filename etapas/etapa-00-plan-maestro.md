@@ -234,8 +234,8 @@ Notas:
 | RF2 | Detalle de un registro (`/history/{id}` con id propio) | 4, 8 | Verificado localmente |
 | RF3 | Paginación (default 25, `?page=2&limit=25`) | 4, 12 | Verificado localmente |
 | RF4 | Filtros sobre propiedades (incl. `receivedAt` y fechas) | 2, 4, 12 | Verificado localmente |
-| RNF-1 | Separación de servicios `connector` / `master` | 4, 5, 6 | Pendiente |
-| RNF-2 | `connector` → `master` vía HTTP POST | 2, 5 | En progreso |
+| RNF-1 | Separación de servicios `connector` / `master` | 4, 5, 6 | Verificado localmente |
+| RNF-2 | `connector` → `master` vía HTTP POST | 2, 5 | Verificado localmente |
 | RNF-3 | Resiliencia: reconexión automática a RabbitMQ | 3, 5, 12 | Verificado localmente |
 | RNF-4 | `master` operativo sin RabbitMQ/connector | 4, 12 | Verificado localmente |
 | RNF-5 | Dockerización + HEALTHCHECK por contenedor | 6 | Pendiente |
