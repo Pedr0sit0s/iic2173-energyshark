@@ -13,7 +13,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 4 — Servicio `master` (local) | Verificado localmente (CP-L4) |
 | 5 — Servicio `connector` (local) | Verificado localmente (CP-L5) |
 | 6 — Dockerización + Docker Compose | Verificado localmente (CP-L6) |
-| 7–15 | Pendientes |
+| 7 — Infraestructura AWS (EC2 + RDS) | Verificado en producción (CP-P1) |
+| 8–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -23,7 +24,7 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 flowchart LR
     subgraph Curso[Infraestructura del curso]
         P[Producer]
-        X[Exchange energy.x]
+        X[Exchange fulfillment.x]
         Q[Cola del observer]
     end
     subgraph EC2[AWS EC2 · Docker]
@@ -92,7 +93,8 @@ flowchart LR
 | RNF-4 | `master` operativo sin RabbitMQ/connector | Verificado localmente |
 | RNF-5 | Dockerización + HEALTHCHECK por contenedor | Verificado localmente |
 | RNF-6 | Docker Compose (master + connector + postgres local) | Verificado localmente |
-| RNF-7..10, DOC, ENT | AWS, dominio, Nginx, HTTPS, entrega | Pendientes |
+| RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | En progreso (infraestructura lista; despliegue en la Etapa 8) |
+| RNF-8..10, DOC, ENT | Dominio, Nginx, HTTPS, entrega | Pendientes |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
