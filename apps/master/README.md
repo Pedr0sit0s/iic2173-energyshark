@@ -6,8 +6,8 @@ Servicio `master` de EnergyShark (Entrega 0 · IIC2173): API REST NestJS que per
 
 | Método | Ruta | Descripción | Requisito |
 | --- | --- | --- | --- |
-| POST | `/events` | Ingesta interna de eventos (`connector` → `master`); asigna `receivedAt` en UTC | RNF-2 |
-| GET | `/history` | Historial paginado (default 25) con filtros `type`, `receivedAtFrom/To`, `validUntilFrom/To` y `city` (JSONB) | RF1, RF3, RF4 |
+| POST | `/events` | Ingesta interna de eventos (`connector` → `master`); asigna `receivedAt` (UTC), extrae `validUntil` de `packageBody` y es idempotente por `idpk` | RNF-2 |
+| GET | `/history` | Historial paginado (default 25) con filtros `type`, `receivedAt` (día), `receivedAtFrom/To`, `validUntilFrom/To` y `city` (dentro de `packageBody.demands[]`) | RF1, RF3, RF4 |
 | GET | `/history/:id` | Detalle por `id` propio (404 si no existe) | RF2 |
 | GET | `/health` | Health check con verificación de conexión a PostgreSQL | RNF-5 |
 

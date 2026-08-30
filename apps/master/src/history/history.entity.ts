@@ -13,7 +13,8 @@ export class History {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid', comment: 'UUID del evento asignado por el curso (idpk)' })
+  @Index('IDX_history_idpk', { unique: true })
+  @Column({ type: 'uuid', comment: 'UUID del evento asignado por el curso (idpk, no repetible)' })
   idpk: string;
 
   @Index('IDX_history_type')
