@@ -36,5 +36,8 @@ ai_docs/
 | 2026-08-26 | `prompts/2026-08-26-etapa-03-poc-rabbitmq.md` | Inicio de la Etapa 3 (PoC RabbitMQ) |
 | 2026-08-29 | `prompts/2026-08-29-etapa-03-refactor-y-cierre.md` | Etapa 3: refactor del PoC, revisión de bitácora y versionado |
 | 2026-08-29 | `prompts/2026-08-29-etapa-04-master-local.md` | Inicio de la Etapa 4 (servicio `master` local) |
-| 2026-08-29 | `prompts/2026-08-29-etapa-04-ejecucion-cierre.md` | Etapa 4: ejecución (endpoints RF1–RF4) y cierre |
 | 2026-08-29 | `prompts/2026-08-29-etapa-04-revision-commits.md` | Etapa 4: revisión, correcciones, bitácora y reescritura de commits |
+| 2026-08-29 | `prompts/2026-08-29-etapa-04-ejecucion-cierre.md` | Etapa 4: ejecución (endpoints RF1–RF4) y cierre |
+| 2026-08-29 | `prompts/2026-08-29-etapa-05-connector-local.md` | Inicio de la Etapa 5 (servicio `connector` local) |
+| 2026-08-29 | `prompts/2026-08-29-etapa-05-ejecucion-cierre.md` | Etapa 5: ejecución (connector standalone) y cierre |
+| 2026-08-29 | `prompts/2026-08-29-etapa-05-auditoria-cierre.md` | Etapa 5: auditoría de código, cierre documental y commits granulares |
