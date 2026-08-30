@@ -15,7 +15,8 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | 6 — Dockerización + Docker Compose | Verificado localmente (CP-L6) |
 | 7 — Infraestructura AWS (EC2 + RDS) | Verificado en producción (CP-P1) |
 | 8 — Primer despliegue en EC2 (MVP) | Verificado en producción (CP-P2) |
-| 9–15 | Pendientes |
+| 9 — Dominio y DNS | Verificado en producción (CP-P3) |
+| 10–15 | Pendientes |
 
 Índice completo y trazabilidad: [`etapas/README.md`](etapas/README.md) y [`etapas/etapa-00-plan-maestro.md`](etapas/etapa-00-plan-maestro.md).
 
@@ -95,7 +96,8 @@ flowchart LR
 | RNF-5 | Dockerización + HEALTHCHECK por contenedor | Verificado localmente |
 | RNF-6 | Docker Compose (master + connector + postgres local) | Verificado localmente |
 | RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | Verificado en producción |
-| RNF-8..10, DOC, ENT | Dominio, Nginx, HTTPS, entrega | Pendientes |
+| RNF-8 | Dominio público y DNS hacia EC2 | Verificado en producción |
+| RNF-9..10, DOC, ENT | Nginx, HTTPS, entrega | Pendientes |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
