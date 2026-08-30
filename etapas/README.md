@@ -46,7 +46,7 @@
 | 5 | `etapa-05-connector-local.md` | Servicio `connector`: consumo AMQP + reenvío HTTP | Verificado localmente |
 | 6 | `etapa-06-docker-compose.md` | Dockerización de ambos servicios + Compose + health checks | Verificado localmente |
 | 7 | `etapa-07-aws-ec2-rds.md` | Infraestructura AWS: EC2 (Free Tier) + RDS PostgreSQL | Verificado en producción |
-| 8 | `etapa-08-primer-despliegue.md` | Primer despliegue funcional en EC2 (MVP en producción) | Pendiente |
+| 8 | `etapa-08-primer-despliegue.md` | Primer despliegue funcional en EC2 (MVP en producción) | Verificado en producción |
 | 9 | `etapa-09-dominio-dns.md` | Dominio Namecheap, registro A y propagación DNS | Pendiente |
 | 10 | `etapa-10-nginx-reverse-proxy.md` | Nginx en el host EC2 como reverse proxy | Pendiente |
 | 11 | `etapa-11-https-letsencrypt.md` | HTTPS con Let's Encrypt + renovación automática | Pendiente |
@@ -61,4 +61,4 @@ La Etapa 2 (diseño de arquitectura) está **Completada** al 100%. Las Etapas 3�
 
 ## Siguiente etapa recomendada
 
-**Etapa 8** (`etapa-08-primer-despliegue.md`) — Primer despliegue en producción (MVP en EC2): clonar el repo en la EC2, `.env` de producción, Compose de producción con `master` + `connector` conectados a RDS, verificación end-to-end y procedimiento de despliegue/rollback (checkpoint CP-P2).
+**Etapa 9** (`etapa-09-dominio-dns.md`) — Dominio y DNS: registrar/verificar el dominio `persito.online` en Namecheap, crear el **registro A** apuntando a la Elastic IP `3.216.254.80` y verificar la propagación con `dig` (checkpoint CP-P3).
