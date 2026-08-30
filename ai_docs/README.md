@@ -54,3 +54,5 @@ ai_docs/
 | 2026-08-30 | `prompts/2026-08-30-etapa-10-cierre-auditoria.md` | Etapa 10: cierre (Nginx reverse proxy, documentación y versionado) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-11-https-letsencrypt.md` | Inicio de la Etapa 11 (HTTPS con Let's Encrypt) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-11-cierre-auditoria.md` | Etapa 11: cierre (HTTPS Let's Encrypt, documentación y versionado) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-12-resiliencia-healthchecks.md` | Inicio de la Etapa 12 (resiliencia y health checks) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-12-cierre-auditoria.md` | Etapa 12: cierre (resiliencia y health checks, documentación y versionado) |
