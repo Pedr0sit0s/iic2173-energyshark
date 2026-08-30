@@ -238,8 +238,8 @@ Notas:
 | RNF-2 | `connector` → `master` vía HTTP POST | 2, 5 | Verificado localmente |
 | RNF-3 | Resiliencia: reconexión automática a RabbitMQ | 3, 5, 12 | Verificado localmente |
 | RNF-4 | `master` operativo sin RabbitMQ/connector | 4, 12 | Verificado localmente |
-| RNF-5 | Dockerización + HEALTHCHECK por contenedor | 6 | Pendiente |
-| RNF-6 | Docker Compose (master + connector + postgres local) | 6 | Pendiente |
+| RNF-5 | Dockerización + HEALTHCHECK por contenedor | 6 | Verificado localmente |
+| RNF-6 | Docker Compose (master + connector + postgres local) | 6 | Verificado localmente |
 | RNF-7 | Despliegue en AWS (EC2 + RDS, Free Tier) | 7, 8 | Pendiente |
 | RNF-8 | Dominio público y DNS hacia EC2 | 9 | Pendiente |
 | RNF-9 | Nginx reverse proxy instalado en el host | 10 | Pendiente |
