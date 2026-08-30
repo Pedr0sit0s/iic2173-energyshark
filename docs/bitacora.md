@@ -50,6 +50,10 @@
 | 26 | 2026-08-30 | Etapa 12 — Resiliencia y health checks (ejecución y cierre) |
 | 27 | 2026-08-30 | Etapa 13 — Trazabilidad y auditoría (planificación e inicio) |
 | 28 | 2026-08-30 | Etapa 13 — Trazabilidad y auditoría (ejecución y cierre) |
+| 29 | 2026-08-30 | Etapa 14 — Documentación de IA y bitácora (planificación e inicio) |
+| 30 | 2026-08-30 | Etapa 15 — Entrega final (planificación e inicio) |
+| 31 | 2026-08-30 | Etapa 14 — Documentación de IA y bitácora (ejecución y cierre) |
+| 32 | 2026-08-30 | Etapa 15 — Entrega final (ejecución y cierre) |
 
 ---
 
@@ -779,6 +783,83 @@ git branch -M main
 - **Comandos importantes:** los de la sección 9 de `etapa-13-trazabilidad-auditoria.md` (curl, dig, openssl, git log, ls ai_docs).
 - **Resultado de pruebas:** Auditoría cerrada: todo requisito de la parte mínima, Docker-Compose y la variable HTTPS tiene estado + evidencia. **CP-L7 alcanzado** (la consolidación final de DOC-1 y la bitácora se cierra en la Etapa 14).
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-13-cierre-auditoria.md`
+- **Estado:** Completado
+
+---
+
+## Entrada 29 — Etapa 14 — Documentación de IA y bitácora (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 14 según el Plan Maestro: generar el plan detallado `etapas/etapa-14-documentacion-ia-bitacora.md` para cerrar DOC-1 (registro de IA completo) y consolidar la bitácora (CP-L7).
+- **Decisiones técnicas:**
+  - Verificación **registro por registro** de `ai_docs/prompts/` (formato con 7 campos) + cruce con la bitácora.
+  - Bitácora: **corrección puntual** (formato/redacción) sin alterar el historial.
+  - DOC-1 → "Verificado localmente" al terminar la verificación.
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-14-documentacion-ia-bitacora.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-14-documentacion-ia-bitacora.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 14.1–14.3; DOC-1)
+
+---
+
+## Entrada 30 — Etapa 15 — Entrega final (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 15 según el Plan Maestro: generar el plan detallado `etapas/etapa-15-entrega-final.md` para preparar la entrega final (checkpoint CP-P7, DOC-2 y ENT-1).
+- **Decisiones técnicas:**
+  - README con **sección de entrega** (consideraciones, dominio, acceso con `.pem`/`ssh`, logrados/no logrados) — DOC-2.
+  - **Checklist final de producción** con comandos reproducibles (healthy, dominio, HTTPS, RabbitMQ, paginación, filtros).
+  - Accesos para **Canvas** (dominio, IP, comando `ssh`) y **`.pem` fuera del repositorio** (verificado con `git ls-files`) — ENT-1.
+  - Verificación **end-to-end final en producción** (CP-P7).
+- **Problemas encontrados y solución:** Sin problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-15-entrega-final.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-15-entrega-final.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 15.1–15.4; checkpoint CP-P7)
+
+---
+
+## Entrada 31 — Etapa 14 — Documentación de IA y bitácora (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 14.1–14.3 de la Etapa 14: verificar el registro de uso de IA (DOC-1) y consolidar la bitácora técnica (CP-L7).
+- **Resultado de la verificación:**
+  - **Inventario**: 31 registros en `ai_docs/prompts/` y 30 entradas de bitácora (1–30).
+  - **Registros**: los 31 tienen los 7 campos obligatorios (Herramienta, Fecha y hora, Contexto, Prompt, Resumen de la respuesta, Uso dado, Archivos afectados).
+  - **Bitácora**: sin salida cruda de terminal; todas las entradas con la plantilla y sin faltantes.
+  - **Cruce**: las 28 referencias a `ai_docs/prompts/` de la bitácora existen en el disco.
+- **Decisiones técnicas:** Corrección puntual de la bitácora (sin reescribir el historial); índice de `ai_docs/README.md` como registro canónico.
+- **Problemas encontrados y solución:** Ninguno relevante (el registro de IA se mantuvo completo durante todo el proyecto).
+- **Comandos importantes:** `ls ai_docs/prompts/ | wc -l`, `grep -c "^## Entrada" docs/bitacora.md`, cruce de referencias con `grep -oE`.
+- **Resultado de pruebas:** DOC-1 → **Verificado localmente** (registro de IA completo); CP-L7 consolidado.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-14-cierre-auditoria.md`
+- **Estado:** Completado
+
+---
+
+## Entrada 32 — Etapa 15 — Entrega final (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 15.1–15.4 de la Etapa 15: preparar el README de entrega, el checklist final de producción, los accesos para Canvas y la verificación end-to-end (checkpoint CP-P7, DOC-2 y ENT-1).
+- **Resumen técnico:**
+  - **README con sección de entrega** (DOC-2): consideraciones generales, dominio, método de acceso con `.pem`/`ssh` (sin credenciales en el repo) y tabla de **logrados/no logrados** (parte mínima, Docker-Compose y variable HTTPS).
+  - **Checklist final de producción**: `/health` ok; paginación + filtro (`?page=2&limit=25&type=demand-set`) → 200 con 25 items y `meta.total` correcto; dominio resuelve; HTTPS válido (Let's Encrypt); `connector` consumiendo (ingesta en curso: total 2481 → 2482).
+  - **Accesos para Canvas** (ENT-1): dominio, IP `3.216.254.80` y comando `ssh -i ~/.ssh/energyshark.pem energyshark@3.216.254.80`; `.pem` **verificado fuera del repositorio** (`git ls-files | grep -i pem` → vacío).
+  - **Verificación end-to-end** (CP-P7): `GET /history/:id` con id real → **200**; id inexistente → **404**; `meta.total` crece con la ingesta del `connector`.
+- **Verificación (evidencia real):**
+  ```text
+  $ curl https://persito.online/health                                    → {"status":"ok","db":"up"}
+  $ curl "https://persito.online/history?page=2&limit=25&type=demand-set" → 200 · items=25 · total=2481
+  $ dig +short persito.online                                             → 3.216.254.80
+  $ openssl s_client ... | openssl x509 -issuer -dates                    → Let's Encrypt (Aug 30 → Nov 28)
+  $ curl https://persito.online/history/<id>                              → 200 ; <uuid inexistente> → 404
+  $ git ls-files | grep -i pem                                            → vacío
+  ```
+- **Problemas encontrados y solución:** Ninguno; los accesos a la EC2 (comandos `docker compose ps/logs` en el host) quedan como verificación manual del estudiante al momento de entregar.
+- **Comandos importantes:** los de la sección 9 de `etapa-15-entrega-final.md`.
+- **Resultado de pruebas:** **CP-P7 alcanzado**; DOC-2 y ENT-1 → **Completado**. Entrega lista (parte mínima + Docker-Compose + variable HTTPS).
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-15-cierre-auditoria.md`
 - **Estado:** Completado
 
 
