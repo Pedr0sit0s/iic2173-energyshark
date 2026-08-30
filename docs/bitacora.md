@@ -48,6 +48,8 @@
 | 24 | 2026-08-30 | Etapa 11 — HTTPS con Let's Encrypt (ejecución y cierre) |
 | 25 | 2026-08-30 | Etapa 12 — Resiliencia y health checks (planificación e inicio) |
 | 26 | 2026-08-30 | Etapa 12 — Resiliencia y health checks (ejecución y cierre) |
+| 27 | 2026-08-30 | Etapa 13 — Trazabilidad y auditoría (planificación e inicio) |
+| 28 | 2026-08-30 | Etapa 13 — Trazabilidad y auditoría (ejecución y cierre) |
 
 ---
 
@@ -737,6 +739,47 @@ git branch -M main
 - **Resultado de pruebas:** Resiliencia verificada sin pérdida de datos; reconexión automática, reintentos de reenvío y paginación/filtros eficientes con índices. **CP-P6 alcanzado**; RNF-1..RNF-4, RF3 y RF4 verificados en producción.
 - **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-12-cierre-auditoria.md`
 - **Estado:** Verificado en producción (checkpoint CP-P6 alcanzado)
+
+---
+
+## Entrada 27 — Etapa 13 — Trazabilidad y auditoría (planificación e inicio)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Iniciar la Etapa 13 según el Plan Maestro: generar el plan detallado `etapas/etapa-13-trazabilidad-auditoria.md` y dejar lista la hoja de ruta para auditar el proyecto contra el enunciado (checkpoint CP-L7, DOC-1).
+- **Decisiones técnicas:**
+  - Auditoría **por sección del enunciado** (parte mínima / Docker-Compose / variable HTTPS), con **mapeo de numeraciones** (enunciado ↔ plan maestro, sección 4).
+  - Evidencia **reproducible** (curl, dig, openssl, docker compose ps, EXPLAIN ANALYZE) + referencias a bitácora y commits.
+  - Posible **cierre de brechas** menores en esta etapa (p. ej. subir RNF-5/RNF-6 a producción si los healthchecks lo confirman) y documentar las de Etapas 14–15 (DOC-1/README final).
+- **Problemas encontrados y solución:** El proyecto usa dos numeraciones de requisitos (enunciado vs plan maestro): se resuelve con la tabla de mapeo de la sección 4. Sin otros problemas en esta iteración (solo planificación documental).
+- **Comandos importantes:** pendientes de la ejecución (sección 9 de `etapa-13-trazabilidad-auditoria.md`).
+- **Resultado de pruebas:** Plan detallado generado con 17 secciones y la tabla de mapeo enunciado ↔ plan maestro.
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-13-trazabilidad-auditoria.md`
+- **Estado:** En progreso (pendiente: ejecutar sub-etapas 13.1–13.3; checkpoint CP-L7)
+
+---
+
+## Entrada 28 — Etapa 13 — Trazabilidad y auditoría (ejecución y cierre)
+
+- **Fecha:** 2026-08-30
+- **Objetivo:** Ejecutar las sub-etapas 13.1–13.3 de la Etapa 13: auditar el proyecto contra el enunciado, actualizar la matriz de trazabilidad con evidencia y cerrar brechas.
+- **Resumen técnico:**
+  - **Matriz de trazabilidad** (`etapas/etapa-00-plan-maestro.md`, sección 5) actualizada con columna **Evidencia** por requisito (comandos reproducibles + referencias a bitácora y etapas).
+  - **Auditoría por sección del enunciado** (parte mínima / Docker-Compose / variable HTTPS) con el **mapeo de numeraciones** (enunciado ↔ plan maestro).
+  - **RNF-5 y RNF-6 subidos a "Verificado en producción"**: los healthchecks corren en la EC2 (`docker inspect ... .State.Health` → `healthy`) y el Compose de producción (`compose.prod.yaml`) está operativo.
+  - **DOC-1 → "Verificado localmente"** (índice y registros de `ai_docs/prompts/` completos); **DOC-2 y ENT-1 → Pendiente** (Etapa 15: README final y accesos/`.pem`).
+- **Brechas y plan:** README final (DOC-2) y accesos para Canvas + `.pem` (ENT-1) quedan planificados para la Etapa 15; el cierre formal de DOC-1 y la bitácora completa se consolidan en la Etapa 14.
+- **Verificación (evidencia real):**
+  ```text
+  $ curl https://persito.online/health          → {"status":"ok","db":"up"}
+  $ curl "https://persito.online/history?limit=1"  → HTTP 200
+  $ dig +short persito.online                    → 3.216.254.80
+  $ openssl s_client ... | openssl x509 -issuer  → O=Let's Encrypt, CN=persito.online
+  ```
+- **Problemas encontrados y solución:** Dos numeraciones de requisitos (enunciado vs plan maestro): resuelto con la tabla de mapeo. Sin otras brechas funcionales detectadas.
+- **Comandos importantes:** los de la sección 9 de `etapa-13-trazabilidad-auditoria.md` (curl, dig, openssl, git log, ls ai_docs).
+- **Resultado de pruebas:** Auditoría cerrada: todo requisito de la parte mínima, Docker-Compose y la variable HTTPS tiene estado + evidencia. **CP-L7 alcanzado** (la consolidación final de DOC-1 y la bitácora se cierra en la Etapa 14).
+- **Registro de IA:** `ai_docs/prompts/2026-08-30-etapa-13-cierre-auditoria.md`
+- **Estado:** Completado
 
 
 ---
