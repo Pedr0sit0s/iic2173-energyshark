@@ -46,3 +46,5 @@ ai_docs/
 | 2026-08-29 | `prompts/2026-08-29-etapa-06-docker-auditoria-cierre.md` | Etapa 6: auditoría de código, cierre documental y commits granulares |
 | 2026-08-30 | `prompts/2026-08-30-etapa-07-aws-ec2-rds.md` | Inicio de la Etapa 7 (Infraestructura AWS: EC2 + RDS) |
 | 2026-08-30 | `prompts/2026-08-30-etapa-07-cierre-auditoria.md` | Etapa 7: cierre (auditoría, documentación y versionado granular) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-08-primer-despliegue.md` | Inicio de la Etapa 8 (primer despliegue en producción) |
+| 2026-08-30 | `prompts/2026-08-30-etapa-08-cierre-auditoria.md` | Etapa 8: cierre (despliegue en producción, documentación y push) |
