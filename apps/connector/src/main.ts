@@ -19,6 +19,7 @@ async function bootstrap(): Promise<void> {
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
   process.on('unhandledRejection', (reason: unknown) => {
     logger.error(`Rechazo de promesa no manejado: ${reasonOf(reason)}`);
+    process.exit(1);
   });
 }
 

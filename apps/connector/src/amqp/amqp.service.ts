@@ -16,10 +16,6 @@ const RECONNECT_BACKOFF: BackoffOptions = {
 const HEARTBEAT_FILE = '/tmp/connector-heartbeat';
 const HEARTBEAT_INTERVAL_MS = 5_000;
 
-interface AmqpConnectionWithSocket {
-  connection?: { stream?: { destroy(): void } };
-}
-
 /** Oculta la contraseña de una URL AMQP antes de mostrarla en logs. */
 function formatUrl(url: string): string {
   const parsed = new URL(url);
@@ -84,18 +80,6 @@ export class AmqpService implements OnApplicationBootstrap, OnApplicationShutdow
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
-  }
-
-  /** Modo caos: destruye el socket TCP para simular un corte de red (pruebas). */
-  destroySocket(): void {
-    const raw = this.connection as unknown as AmqpConnectionWithSocket | null;
-    const socket = raw?.connection?.stream;
-    if (!socket) {
-      logger.warn('No hay conexión activa que destruir.');
-      return;
-    }
-    logger.warn('CHAOS: destruyendo el socket TCP (simula corte de red)...');
-    socket.destroy();
   }
 
   private async connect(): Promise<void> {
