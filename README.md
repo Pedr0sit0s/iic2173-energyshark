@@ -151,7 +151,7 @@ ssh -i ~/.ssh/energyshark.pem energyshark@3.216.254.80
 | — | Documentación de IA (`ai_docs/prompts`) | Logrado (DOC-1) |
 | — | README de entrega | Logrado (DOC-2) |
 
-**Documentación
+**Documentación:**
 
 - **Etapas y avance:** [`etapas/README.md`](etapas/README.md)
 - **Bitácora técnica:** [`docs/bitacora.md`](docs/bitacora.md)
