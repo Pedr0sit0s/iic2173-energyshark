@@ -19,4 +19,8 @@ async function bootstrap(): Promise<void> {
   console.log(`Master API listening on http://localhost:${port}`);
 }
 
+process.on('unhandledRejection', (reason: unknown) => {
+  console.error('Unhandled promise rejection:', reason);
+});
+
 void bootstrap();
