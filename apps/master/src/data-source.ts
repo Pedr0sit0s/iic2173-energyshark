@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 import { DataSource } from 'typeorm';
+import { readFileSync } from 'fs';
 
 dotenv.config({ path: join(__dirname, '..', '..', '..', '.env') });
 
@@ -36,5 +37,10 @@ export const AppDataSource = new DataSource({
   logging: process.env.NODE_ENV === 'development',
   // Same note as app.module.ts: DB_SSL cifra sin validar el CA de RDS.
   // Pendiente: empaquetar el bundle de CA y usar rejectUnauthorized: true.
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.DB_SSL === 'true'
+    ? { 
+      ca: readFileSync(join(process.cwd(), 'apps', 'master', 'certs', 'global-bundle.pem')).toString(), 
+      rejectUnauthorized: true 
+    }
+    : false,
 });

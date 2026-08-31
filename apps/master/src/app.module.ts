@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { validateConfig } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { HistoryModule } from './history/history.module';
+import { readFileSync } from 'fs';
 
 const ENV_FILE = join(__dirname, '..', '..', '..', '.env');
 
@@ -33,14 +34,11 @@ const ENV_FILE = join(__dirname, '..', '..', '..', '.env');
 
         ssl:
           config.get<string>('DB_SSL') === 'true'
-            ? // TODO(seguridad): RDS cifra la conexión pero aquí NO se valida el
-              // certificado del servidor. Para verificar el CA de RDS hay que
-              // empaquetar el bundle (p. ej. rds-ca-rsa2048-g1.pem) y usar
-              // `{ ca: <buffer>, rejectUnauthorized: true }`. No se habilita por
-              // defecto para no romper la conexión de producción sin antes
-              // validar el certificado real de la instancia RDS.
-              { rejectUnauthorized: false }
-            : undefined,
+            ? { 
+                ca: readFileSync(join(process.cwd(), 'apps', 'master', 'certs', 'global-bundle.pem')).toString(), 
+                rejectUnauthorized: true 
+              }
+            : false,
 
         retryAttempts: 5,
         retryDelay: 1000,
