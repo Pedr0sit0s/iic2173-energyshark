@@ -30,6 +30,10 @@ class EnvironmentVariables {
   RABBITMQ_QUEUE: string;
 
   @IsString()
+  @MinLength(8)
+  INTERNAL_TOKEN: string;
+
+  @IsString()
   @IsUrl({ require_tld: false })
   MASTER_URL: string;
 

@@ -34,5 +34,7 @@ export const AppDataSource = new DataSource({
 
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
+  // Same note as app.module.ts: DB_SSL cifra sin validar el CA de RDS.
+  // Pendiente: empaquetar el bundle de CA y usar rejectUnauthorized: true.
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });

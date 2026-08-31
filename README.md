@@ -7,7 +7,7 @@ Plataforma observadora del flujo de energía eléctrica entre ciudades. Consume 
 | Etapa | Estado |
 | --- | --- |
 | 0 — Plan Maestro | Completado |
-| 1 — Preparación del entorno | En progreso (cierre documental) |
+| 1 — Preparación del entorno | Completado |
 | 2 — Diseño de arquitectura | Completado |
 | 3 — PoC RabbitMQ | Verificado localmente (CP-L3) |
 | 4 — Servicio `master` (local) | Verificado localmente (CP-L4) |
@@ -93,7 +93,7 @@ flowchart LR
 | RF1 | Historial de demanda eléctrica | Verificado en producción |
 | RF2 | Detalle de un registro (`/history/{id}`) | Verificado en producción |
 | RF3 | Paginación (default 25) | Verificado en producción |
-| RF4 | Filtros (incl. `receivedAt` y fechas) | Verificado en producción |
+| RF4 | Filtros (`type`, `idpk`, `receivedAt`/rangos, `validUntil`, `city`, `unit`, `demand`) | Verificado en producción |
 | RNF-1 | Separación de servicios `connector`/`master` | Verificado en producción |
 | RNF-2 | `connector` → `master` vía HTTP POST | Verificado en producción |
 | RNF-3 | Reconexión automática a RabbitMQ | Verificado en producción |
@@ -104,7 +104,7 @@ flowchart LR
 | RNF-8 | Dominio público y DNS hacia EC2 | Verificado en producción |
 | RNF-9 | Nginx reverse proxy instalado en el host | Verificado en producción |
 | RNF-10 | HTTPS con Let's Encrypt + renovación automática | Verificado en producción |
-| DOC, ENT | Documentación de IA, entrega | Pendientes |
+| DOC, ENT | Documentación de IA, entrega | Completados |
 
 Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
@@ -134,7 +134,7 @@ ssh -i ~/.ssh/energyshark.pem energyshark@3.216.254.80
 | Parte mínima | RF1 — Historial de demanda en la API | Logrado (producción) |
 | Parte mínima | RF2 — Detalle `/history/:id` | Logrado (producción) |
 | Parte mínima | RF3 — Paginación (default 25) | Logrado (producción) |
-| Parte mínima | RF4 — Filtros (incl. `receivedAt` y fechas) | Logrado (producción) |
+| Parte mínima | RF4 — Filtros (`type`, `idpk`, `receivedAt`/rangos, `validUntil`, `city`, `unit`, `demand`) | Logrado (producción) |
 | Parte mínima | RNF1 — `connector` AMQP + reconexión + master sin broker | Logrado (producción) |
 | Parte mínima | RNF2 — Containerizado, `master` recibe de `connector` | Logrado (producción) |
 | Parte mínima | RNF3 — Proxy inverso Nginx en el host | Logrado (producción) |
@@ -163,17 +163,20 @@ ssh -i ~/.ssh/energyshark.pem energyshark@3.216.254.80
 - El archivo `.pem` de EC2 **jamás** se sube al repositorio.
 - Contraseñas y access keys viven únicamente en archivos locales fuera del control de versiones.
 - En producción, los secretos se guardan en el host EC2, no en el repositorio.
+- El endpoint interno `POST /events` está protegido por un secreto compartido (`INTERNAL_TOKEN`) entre `connector` y `master`.
 
 ## Quickstart
 
 ### Con Docker Compose (recomendado)
 
 ```bash
-cp .env.example .env   # completar credenciales (RABBITMQ_URL, DB_*, etc.)
+cp .env.example .env   # completar credenciales (RABBITMQ_URL, DB_*, INTERNAL_TOKEN, etc.)
 docker compose up --build -d   # postgres + master + connector (red interna)
 docker compose ps              # los tres contenedores deben estar "healthy"
 curl http://localhost:3000/health   # { "status": "ok", "db": "up" }
 ```
+
+> Generar `INTERNAL_TOKEN` con `openssl rand -hex 32` y usar el **mismo valor** en `master` y `connector`.
 
 ### Sin Docker (servicios locales)
 
@@ -190,7 +193,6 @@ cd apps/connector && npm install && npm run start
 ```
 
 Flujo end-to-end verificado en local y en contenedores: RabbitMQ → connector → master → PostgreSQL.
-La infraestructura en AWS (EC2 + RDS) llega en las **Etapas 7–8**.
 
 ## Uso de IA
 

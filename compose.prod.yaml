@@ -12,6 +12,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       DB_SSL: "true"
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
     ports:
       - "127.0.0.1:3000:3000"
     command: sh -c "npm run migration:run:prod && node dist/main"
@@ -30,6 +31,7 @@ services:
       MASTER_URL: http://master:3000
       RABBITMQ_URL: ${RABBITMQ_URL}
       RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-observer.45.q}
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
       REQUEST_TIMEOUT_MS: ${REQUEST_TIMEOUT_MS:-5000}
       MAX_FORWARD_RETRIES: ${MAX_FORWARD_RETRIES:-5}
     depends_on:

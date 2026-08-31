@@ -51,6 +51,10 @@ class EnvironmentVariables {
   @IsString()
   DB_SSL?: string;
 
+  @IsString()
+  @MinLength(8)
+  INTERNAL_TOKEN: string;
+
   @IsOptional()
   @IsString()
   RABBITMQ_URL?: string;

@@ -1,5 +1,14 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_LIMIT = 25;
@@ -22,6 +31,19 @@ export class QueryHistoryDto {
   @IsOptional()
   @IsString()
   type?: string;
+
+  @IsOptional()
+  @IsUUID()
+  idpk?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  demand?: number;
+
+  @IsOptional()
+  @IsString()
+  unit?: string;
 
   @IsOptional()
   @IsDateString()

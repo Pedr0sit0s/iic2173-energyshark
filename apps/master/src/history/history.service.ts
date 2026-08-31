@@ -26,6 +26,16 @@ function isUniqueViolation(error: unknown): boolean {
   );
 }
 
+/**
+ * Convierte un string de fecha (ISO8601, p. ej. "2025-08-08" o "2025-08-08T10:00:00Z")
+ * en el rango [00:00:00.000Z, 00:00:00.000Z + 1 día). Al usar un rango (en lugar de
+ * `::date`) la consulta puede aprovechar el índice de `receivedAt`.
+ */
+function dayRangeUtc(value: string): { start: Date; end: Date } {
+  const start = new Date(`${value.slice(0, 10)}T00:00:00.000Z`);
+  return { start, end: new Date(start.getTime() + 86_400_000) };
+}
+
 @Injectable()
 export class HistoryService {
   constructor(
@@ -66,10 +76,15 @@ export class HistoryService {
     if (query.type) {
       qb.andWhere('"h"."type" = :type', { type: query.type });
     }
+    if (query.idpk) {
+      qb.andWhere('"h"."idpk" = :idpk', { idpk: query.idpk });
+    }
     if (query.receivedAt) {
-      // Filtro por día (UTC): ?receivedAt=2025-08-08 → ese día calendario.
-      qb.andWhere('("h"."receivedAt")::date = :receivedAt', {
-        receivedAt: query.receivedAt,
+      // Filtro por día (UTC) con rango: ?receivedAt=2025-08-08 → ese día calendario.
+      const { start, end } = dayRangeUtc(query.receivedAt);
+      qb.andWhere('"h"."receivedAt" >= :receivedAtStart AND "h"."receivedAt" < :receivedAtEnd', {
+        receivedAtStart: start,
+        receivedAtEnd: end,
       });
     }
     if (query.receivedAtFrom) {
@@ -100,6 +115,26 @@ export class HistoryService {
           WHERE demand ->> 'city' = :city
         )`,
         { city: query.city },
+      );
+    }
+    if (query.unit) {
+      // La unidad vive dentro de `packageBody.demands[].unit` (p. ej. "GW").
+      qb.andWhere(
+        `EXISTS (
+          SELECT 1 FROM jsonb_array_elements("h"."packageBody" -> 'demands') AS demand
+          WHERE demand ->> 'unit' = :unit
+        )`,
+        { unit: query.unit },
+      );
+    }
+    if (query.demand !== undefined) {
+      // El valor de demanda vive dentro de `packageBody.demands[].demand` (número).
+      qb.andWhere(
+        `EXISTS (
+          SELECT 1 FROM jsonb_array_elements("h"."packageBody" -> 'demands') AS demand
+          WHERE (demand ->> 'demand')::numeric = :demand
+        )`,
+        { demand: query.demand },
       );
     }
 

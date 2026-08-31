@@ -33,7 +33,13 @@ const ENV_FILE = join(__dirname, '..', '..', '..', '.env');
 
         ssl:
           config.get<string>('DB_SSL') === 'true'
-            ? { rejectUnauthorized: false }
+            ? // TODO(seguridad): RDS cifra la conexión pero aquí NO se valida el
+              // certificado del servidor. Para verificar el CA de RDS hay que
+              // empaquetar el bundle (p. ej. rds-ca-rsa2048-g1.pem) y usar
+              // `{ ca: <buffer>, rejectUnauthorized: true }`. No se habilita por
+              // defecto para no romper la conexión de producción sin antes
+              // validar el certificado real de la instancia RDS.
+              { rejectUnauthorized: false }
             : undefined,
 
         retryAttempts: 5,

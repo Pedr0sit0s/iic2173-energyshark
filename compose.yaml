@@ -31,6 +31,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_NAME: ${DB_NAME:-energy_db}
       DB_SSL: "false"
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
     command: ["sh", "-c", "npm run migration:run:prod && node dist/main"]
     ports:
       - "3000:3000"
@@ -47,6 +48,7 @@ services:
       RABBITMQ_URL: ${RABBITMQ_URL}
       RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-observer.45.q}
       MASTER_URL: http://master:3000
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
       REQUEST_TIMEOUT_MS: ${REQUEST_TIMEOUT_MS:-5000}
       MAX_FORWARD_RETRIES: ${MAX_FORWARD_RETRIES:-5}
     depends_on:

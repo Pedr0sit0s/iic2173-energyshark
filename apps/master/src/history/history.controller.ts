@@ -8,11 +8,13 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { QueryHistoryDto } from './dto/query-history.dto';
 import { History } from './history.entity';
 import { HistoryPage, HistoryService } from './history.service';
+import { InternalTokenGuard } from './internal-token.guard';
 
 @Controller()
 export class HistoryController {
@@ -20,6 +22,7 @@ export class HistoryController {
 
   @Post('events')
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(InternalTokenGuard)
   create(@Body() dto: CreateEventDto): Promise<History> {
     return this.historyService.create(dto);
   }

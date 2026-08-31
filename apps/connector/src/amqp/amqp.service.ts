@@ -123,6 +123,20 @@ export class AmqpService implements OnApplicationBootstrap, OnApplicationShutdow
       channel.on('error', (error: Error) => {
         logger.error(`ERROR de canal: ${error.message}`);
       });
+      channel.on('close', () => {
+        if (this.shuttingDown || this.channel !== channel) {
+          // Cierre intencional (shutdown) o canal viejo de una reconexión previa.
+          return;
+        }
+        this.channel = null;
+        logger.warn('Canal cerrado por el broker.');
+        // Si la conexión sigue viva, la cerramos para forzar una reconexión limpia
+        // y no dejar una conexión huérfana sin consumidor.
+        if (this.connection) {
+          this.connection.close().catch(() => undefined);
+        }
+        this.scheduleReconnect();
+      });
 
       await channel.prefetch(1);
 
