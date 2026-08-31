@@ -110,7 +110,9 @@ Matriz de trazabilidad completa: `etapas/etapa-00-plan-maestro.md` (sección 5).
 
 ## Entrega (E0 · IIC2173 · EnergyShark)
 
-**Dominio:** https://persito.online
+**Dominio (API):** https://persito.online
+
+**IP de la instancia:** 3.216.254.80
 
 **Acceso SSH:**
 
