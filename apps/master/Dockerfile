@@ -15,6 +15,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nestjs
 COPY --from=build --chown=nestjs:nodejs /app/dist ./dist
+COPY certs ./certs
 ENV HOME=/tmp
 USER nestjs
 EXPOSE 3000

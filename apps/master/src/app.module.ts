@@ -34,9 +34,9 @@ const ENV_FILE = join(__dirname, '..', '..', '..', '.env');
 
         ssl:
           config.get<string>('DB_SSL') === 'true'
-            ? { 
-                ca: readFileSync(join(process.cwd(), 'apps', 'master', 'certs', 'global-bundle.pem')).toString(), 
-                rejectUnauthorized: true 
+            ? {
+                ca: readFileSync(join(__dirname, '..', 'certs', 'global-bundle.pem')).toString(),
+                rejectUnauthorized: true,
               }
             : false,
 

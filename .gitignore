@@ -4,6 +4,7 @@ dist/
 .env.*
 !.env.example
 *.pem
+!apps/master/certs/global-bundle.pem
 *.log
 .DS_Store
 *.tsbuildinfo

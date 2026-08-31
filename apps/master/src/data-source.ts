@@ -35,12 +35,12 @@ export const AppDataSource = new DataSource({
 
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  // Same note as app.module.ts: DB_SSL cifra sin validar el CA de RDS.
-  // Pendiente: empaquetar el bundle de CA y usar rejectUnauthorized: true.
+  // En producción (DB_SSL=true) se valida el CA de RDS. El bundle debe estar
+  // empaquetado en apps/master/certs/ (se copia a la imagen con el Dockerfile).
   ssl: process.env.DB_SSL === 'true'
-    ? { 
-      ca: readFileSync(join(process.cwd(), 'apps', 'master', 'certs', 'global-bundle.pem')).toString(), 
-      rejectUnauthorized: true 
-    }
+    ? {
+        ca: readFileSync(join(__dirname, '..', 'certs', 'global-bundle.pem')).toString(),
+        rejectUnauthorized: true,
+      }
     : false,
 });
